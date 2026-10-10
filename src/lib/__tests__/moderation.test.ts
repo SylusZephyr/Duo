@@ -32,7 +32,7 @@ describe("report reasons", () => {
     const match = /reports_reason_check[\s\S]*?CHECK \(reason IN \(([^)]+)\)\)/.exec(MIGRATION);
     expect(match, "the reason CHECK constraint should exist").toBeTruthy();
 
-    const inDatabase = [...match![1].matchAll(/'([a-z_]+)'/g)].map((m) => m[1]).sort();
+    const inDatabase = [...match![1]!.matchAll(/'([a-z_]+)'/g)].map((m) => m[1]!).sort();
     const inCode = REPORT_REASONS.map((r) => r.value).sort();
     expect(inCode).toEqual(inDatabase);
   });
@@ -51,7 +51,7 @@ describe("moderation actions", () => {
   it("only allows the three actions the function implements", () => {
     const match = /_action NOT IN \(([^)]+)\)/.exec(MIGRATION);
     expect(match).toBeTruthy();
-    const allowed = [...match![1].matchAll(/'([a-z_]+)'/g)].map((m) => m[1]).sort();
+    const allowed = [...match![1]!.matchAll(/'([a-z_]+)'/g)].map((m) => m[1]!).sort();
     expect(allowed).toEqual(["dismiss", "restore", "take_down"]);
   });
 

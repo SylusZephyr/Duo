@@ -1218,6 +1218,8 @@ export type Database = {
         Returns: boolean;
       };
       announce_unlocked_letters: { Args: Record<string, never>; Returns: number };
+      delete_my_account: { Args: Record<string, never>; Returns: undefined };
+      export_my_data: { Args: Record<string, never>; Returns: Json };
       create_space: {
         Args: { _anniversary?: string | null; _name: string };
         Returns: Database["public"]["Tables"]["spaces"]["Row"];

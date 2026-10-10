@@ -1,6 +1,6 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Award, Check, Copy, LogOut, Plus } from "lucide-react";
+import { Award, Check, Copy, Download, LogOut, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { evaluateBadges, postingStreak, type BadgeKey } from "@/lib/achievements";
 import { daysBetween, formatDay } from "@/lib/format";
+import { useDeleteMyAccount, useExportMyData } from "@/lib/account";
 import { badgeTitle, useEarnedBadges, useRecordBadges } from "@/lib/notifications";
 import { useBucketList, useJournal, useMe, useMilestones, useSpaceStats } from "@/lib/queries";
 import { useRequireSpace } from "@/lib/use-require-space";
@@ -50,6 +51,9 @@ function UsPage() {
   const [description, setDescription] = useState("");
   const [happenedAt, setHappenedAt] = useState(() => new Date().toISOString().slice(0, 10));
   const [handle, setHandle] = useState(data?.space.handle ?? "");
+  const [confirmDelete, setConfirmDelete] = useState("");
+  const exportData = useExportMyData();
+  const deleteAccount = useDeleteMyAccount();
   const [busy, setBusy] = useState(false);
 
   // The dates come from the database already deduplicated and newest-first;
@@ -428,12 +432,85 @@ function UsPage() {
         </button>
       </section>
 
+      <section className="mt-7 space-y-4 rounded-3xl border border-border bg-card p-5">
+        <h2 className="text-2xl">Your data</h2>
+
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-sm">Download everything</p>
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              One JSON file with your moments, journal, chat and milestones, plus links to every
+              photo. The links work for an hour.
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() =>
+              exportData.mutate(undefined, {
+                onSuccess: (count) =>
+                  toast.success(count > 0 ? `Exported, with ${count} files linked` : "Exported"),
+                onError: (error) =>
+                  toast.error(error instanceof Error ? error.message : "Export failed"),
+              })
+            }
+            disabled={exportData.isPending}
+            className="h-11 shrink-0 gap-2 rounded-2xl border-border bg-transparent"
+          >
+            <Download className="size-4" />
+            {exportData.isPending ? "Preparing…" : "Export"}
+          </Button>
+        </div>
+
+        <div className="space-y-3 rounded-2xl border border-destructive/30 bg-destructive/5 p-4">
+          <div>
+            <p className="text-sm text-destructive">Delete your account</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              {(data?.members.length ?? 0) > 1
+                ? "Your account and profile are erased. The moments you two made together stay with your person, no longer attributed to you."
+                : "Your account and this space are erased, with everything in them. Nobody else is in this space, so nothing is kept."}{" "}
+              This cannot be undone — export first if you want a copy.
+            </p>
+          </div>
+          <Input
+            value={confirmDelete}
+            onChange={(event) => setConfirmDelete(event.target.value)}
+            placeholder="Type DELETE to confirm"
+            aria-label="Type DELETE to confirm"
+            className="h-11 rounded-xl bg-background"
+          />
+          <Button
+            onClick={() =>
+              deleteAccount.mutate(undefined, {
+                onSuccess: () => navigate({ to: "/", replace: true }),
+                onError: (error) =>
+                  toast.error(error instanceof Error ? error.message : "Couldn't delete"),
+              })
+            }
+            disabled={confirmDelete !== "DELETE" || deleteAccount.isPending}
+            className="h-11 w-full gap-2 rounded-2xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            <Trash2 className="size-4" />
+            {deleteAccount.isPending ? "Deleting…" : "Delete my account"}
+          </Button>
+        </div>
+      </section>
+
       <button
         onClick={signOut}
         className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground"
       >
         <LogOut className="size-4" /> Sign out
       </button>
+
+      <p className="mt-4 pb-2 text-center text-xs text-muted-foreground">
+        <Link to="/privacy" className="underline-offset-2 hover:underline">
+          Privacy
+        </Link>
+        {" · "}
+        <Link to="/terms" className="underline-offset-2 hover:underline">
+          Terms
+        </Link>
+      </p>
     </AppShell>
   );
 }

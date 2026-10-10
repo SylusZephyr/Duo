@@ -117,7 +117,15 @@ function Landing() {
       <footer className="border-t border-border/60 px-6 py-8">
         <div className="mx-auto flex max-w-5xl items-center justify-between text-xs text-muted-foreground">
           <span className="font-display text-base text-foreground">Duo</span>
-          <Link to="/auth">Sign in</Link>
+          <nav className="flex items-center gap-4">
+            <Link to="/privacy" className="underline-offset-2 hover:underline">
+              Privacy
+            </Link>
+            <Link to="/terms" className="underline-offset-2 hover:underline">
+              Terms
+            </Link>
+            <Link to="/auth">Sign in</Link>
+          </nav>
         </div>
       </footer>
     </div>
