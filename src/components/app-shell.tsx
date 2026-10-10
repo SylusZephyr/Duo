@@ -8,11 +8,13 @@ import {
   Map,
   MessageCircle,
   Plus,
+  Shield,
   Sparkles,
   Images,
 } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { useIsModerator, useOpenReportCount } from "@/lib/moderation";
 import { useUnreadNotifications } from "@/lib/notifications";
 import { useMe, useUnreadMessages } from "@/lib/queries";
 import { useNotificationsRealtime } from "@/lib/realtime";
@@ -48,6 +50,9 @@ export function AppShell({
   const { data: me } = useMe();
   const { data: unread } = useUnreadMessages(me?.id);
   const { data: unreadNotifications } = useUnreadNotifications(me?.id);
+  // Only moderators see the queue link, and only they get a count back.
+  const { data: isModerator } = useIsModerator(me?.id);
+  const { data: openReports } = useOpenReportCount(Boolean(isModerator));
 
   // The bell lives in every header, so the subscription that keeps it honest
   // belongs here rather than on one screen.
@@ -70,6 +75,25 @@ export function AppShell({
           </div>
           <div className="flex items-center gap-2">
             {action}
+            {isModerator ? (
+              <Link
+                to="/moderation"
+                className="press relative grid size-10 place-items-center rounded-full border border-border bg-card text-muted-foreground shadow-soft transition-colors hover:text-candy"
+                activeProps={{ className: "border-candy/50 bg-candy-soft text-candy" }}
+                aria-label={
+                  (openReports ?? 0) > 0
+                    ? `Moderation queue, ${openReports} waiting`
+                    : "Moderation queue"
+                }
+              >
+                <Shield className="size-[18px]" />
+                {(openReports ?? 0) > 0 ? (
+                  <span className="absolute -right-0.5 -top-0.5 grid min-w-[18px] place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+                    {openReports! > 9 ? "9+" : openReports}
+                  </span>
+                ) : null}
+              </Link>
+            ) : null}
             <Link
               to="/inbox"
               className="press relative grid size-10 place-items-center rounded-full border border-border bg-card text-muted-foreground shadow-soft transition-colors hover:text-candy"

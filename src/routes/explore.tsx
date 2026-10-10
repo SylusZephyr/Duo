@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { MapPin } from "lucide-react";
 
+import { ReportButton } from "@/components/report-button";
 import { listPublicMoments } from "@/lib/public.functions";
 import { formatShortDay } from "@/lib/format";
 
@@ -102,6 +103,9 @@ function ExplorePage() {
                       {[moment.place_name, moment.city, moment.country].filter(Boolean).join(" · ")}
                     </p>
                   ) : null}
+                  <div className="pt-1">
+                    <ReportButton postId={moment.id} />
+                  </div>
                 </div>
               </article>
             ))}

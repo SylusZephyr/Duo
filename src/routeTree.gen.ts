@@ -22,6 +22,7 @@ import { Route as AuthenticatedGamesRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
 import { Route as AuthenticatedMapRouteImport } from './routes/_authenticated/map'
+import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
 import { Route as AuthenticatedStartRouteImport } from './routes/_authenticated/start'
 import { Route as AuthenticatedUsRouteImport } from './routes/_authenticated/us'
 import { Route as AuthCallbackRouteImport } from './routes/auth_.callback'
@@ -92,6 +93,11 @@ const AuthenticatedMapRoute = AuthenticatedMapRouteImport.update({
   path: '/map',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedModerationRoute = AuthenticatedModerationRouteImport.update({
+  id: '/moderation',
+  path: '/moderation',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedStartRoute = AuthenticatedStartRouteImport.update({
   id: '/start',
   path: '/start',
@@ -132,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/inbox': typeof AuthenticatedInboxRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/map': typeof AuthenticatedMapRoute
+  '/moderation': typeof AuthenticatedModerationRoute
   '/start': typeof AuthenticatedStartRoute
   '/us': typeof AuthenticatedUsRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -151,6 +158,7 @@ export interface FileRoutesByTo {
   '/inbox': typeof AuthenticatedInboxRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/map': typeof AuthenticatedMapRoute
+  '/moderation': typeof AuthenticatedModerationRoute
   '/start': typeof AuthenticatedStartRoute
   '/us': typeof AuthenticatedUsRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -172,6 +180,7 @@ export interface FileRoutesById {
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
   '/_authenticated/map': typeof AuthenticatedMapRoute
+  '/_authenticated/moderation': typeof AuthenticatedModerationRoute
   '/_authenticated/start': typeof AuthenticatedStartRoute
   '/_authenticated/us': typeof AuthenticatedUsRoute
   '/auth_/callback': typeof AuthCallbackRoute
@@ -193,6 +202,7 @@ export interface FileRouteTypes {
     | '/inbox'
     | '/journal'
     | '/map'
+    | '/moderation'
     | '/start'
     | '/us'
     | '/auth/callback'
@@ -212,6 +222,7 @@ export interface FileRouteTypes {
     | '/inbox'
     | '/journal'
     | '/map'
+    | '/moderation'
     | '/start'
     | '/us'
     | '/auth/callback'
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
     | '/_authenticated/inbox'
     | '/_authenticated/journal'
     | '/_authenticated/map'
+    | '/_authenticated/moderation'
     | '/_authenticated/start'
     | '/_authenticated/us'
     | '/auth_/callback'
@@ -342,6 +354,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMapRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/moderation': {
+      id: '/_authenticated/moderation'
+      path: '/moderation'
+      fullPath: '/moderation'
+      preLoaderRoute: typeof AuthenticatedModerationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/start': {
       id: '/_authenticated/start'
       path: '/start'
@@ -389,6 +408,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
   AuthenticatedJournalRoute: typeof AuthenticatedJournalRoute
   AuthenticatedMapRoute: typeof AuthenticatedMapRoute
+  AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
   AuthenticatedStartRoute: typeof AuthenticatedStartRoute
   AuthenticatedUsRoute: typeof AuthenticatedUsRoute
   AuthenticatedMomentMomentIdRoute: typeof AuthenticatedMomentMomentIdRoute
@@ -403,6 +423,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedInboxRoute: AuthenticatedInboxRoute,
   AuthenticatedJournalRoute: AuthenticatedJournalRoute,
   AuthenticatedMapRoute: AuthenticatedMapRoute,
+  AuthenticatedModerationRoute: AuthenticatedModerationRoute,
   AuthenticatedStartRoute: AuthenticatedStartRoute,
   AuthenticatedUsRoute: AuthenticatedUsRoute,
   AuthenticatedMomentMomentIdRoute: AuthenticatedMomentMomentIdRoute,

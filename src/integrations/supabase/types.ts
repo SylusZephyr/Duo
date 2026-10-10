@@ -751,6 +751,9 @@ export type Database = {
           id: string;
           lat: number | null;
           lng: number | null;
+          moderated_at: string | null;
+          moderated_by: string | null;
+          moderation_note: string | null;
           mood: string | null;
           place_name: string | null;
           space_id: string;
@@ -767,6 +770,9 @@ export type Database = {
           id?: string;
           lat?: number | null;
           lng?: number | null;
+          moderated_at?: string | null;
+          moderated_by?: string | null;
+          moderation_note?: string | null;
           mood?: string | null;
           place_name?: string | null;
           space_id: string;
@@ -783,6 +789,9 @@ export type Database = {
           id?: string;
           lat?: number | null;
           lng?: number | null;
+          moderated_at?: string | null;
+          moderated_by?: string | null;
+          moderation_note?: string | null;
           mood?: string | null;
           place_name?: string | null;
           space_id?: string;
@@ -907,6 +916,9 @@ export type Database = {
           post_id: string;
           reason: string;
           reporter_id: string;
+          resolution: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
           status: string;
         };
         Insert: {
@@ -916,6 +928,9 @@ export type Database = {
           post_id: string;
           reason: string;
           reporter_id: string;
+          resolution: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
           status?: string;
         };
         Update: {
@@ -925,6 +940,9 @@ export type Database = {
           post_id?: string;
           reason?: string;
           reporter_id?: string;
+          resolution?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
           status?: string;
         };
         Relationships: [
@@ -1169,7 +1187,32 @@ export type Database = {
         };
         Returns: boolean;
       };
+      is_moderator: { Args: { _user_id: string }; Returns: boolean };
       is_post_public: { Args: { _post_id: string }; Returns: boolean };
+      moderate_post: {
+        Args: { _action: string; _post_id: string; _reason?: string | null };
+        Returns: undefined;
+      };
+      moderation_queue: {
+        Args: Record<string, never>;
+        Returns: {
+          post_id: string;
+          caption: string;
+          taken_at: string;
+          place: string | null;
+          space_handle: string | null;
+          media_paths: string[];
+          report_count: number;
+          reasons: string[];
+          first_reported_at: string;
+          is_taken_down: boolean;
+        }[];
+      };
+      open_report_count: { Args: Record<string, never>; Returns: number };
+      report_post: {
+        Args: { _details?: string | null; _post_id: string; _reason: string };
+        Returns: undefined;
+      };
       is_space_member: {
         Args: { _space_id: string; _user_id: string };
         Returns: boolean;

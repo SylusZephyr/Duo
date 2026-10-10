@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { MapPin } from "lucide-react";
 
+import { ReportButton } from "@/components/report-button";
 import { daysBetween, formatShortDay } from "@/lib/format";
 import { getPublicSpace } from "@/lib/public.functions";
 
@@ -109,6 +110,9 @@ function PublicSpacePage() {
                       {[moment.place_name, moment.city, moment.country].filter(Boolean).join(" · ")}
                     </p>
                   ) : null}
+                  <div className="pt-1">
+                    <ReportButton postId={moment.id} />
+                  </div>
                 </div>
               </article>
             ))}
