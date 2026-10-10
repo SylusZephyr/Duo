@@ -51,6 +51,17 @@ for migration in "$ROOT"/supabase/migrations/*.sql; do
   psql -f "$migration"
 done
 
+# The seed ships demo data for local dev. Applying it here proves it still
+# matches the schema — a seed that fails leaves `supabase db reset` broken.
+if [ -s "$ROOT/supabase/seed.sql" ]; then
+  echo "→ seed.sql"
+  psql -f "$ROOT/supabase/seed.sql"
+  psql -c "SELECT 'seeded: ' || count(*) || ' moments, ' ||
+    (SELECT count(*) FROM public.notifications) || ' notifications, ' ||
+    (SELECT count(*) FROM public.achievements) || ' badges'
+    FROM public.posts;"
+fi
+
 for test in "$ROOT"/supabase/tests/*_test.sql; do
   [ -e "$test" ] || continue
   echo "→ $(basename "$test")"

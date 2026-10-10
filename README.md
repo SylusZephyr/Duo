@@ -21,17 +21,20 @@ Most of the product rules live in the database: row-level security scopes every
 table to a space, a space is capped at two members by both the join RPC and the
 policy, and notifications are fanned out by triggers rather than by the client.
 
-## Setup
+## Running it
+
+One command gets you the whole thing on localhost — Postgres, auth, storage
+and a demo couple with a year of history. No accounts, no API keys:
 
 ```sh
-npm install
-cp .env.example .env    # then fill it in
-npm run dev
+./scripts/dev-setup.sh    # needs Node 20+, Docker and the Supabase CLI
+npm run dev               # http://localhost:8080
 ```
 
-`.env.example` documents every variable and why the two Google Maps keys are
-separate. Supabase Auth also needs Google enabled as a provider, with
-`https://your-domain/auth/callback` in its redirect allow-list.
+Sign in as `alex@example.com` or `sam@example.com`, both `password123`.
+
+[DEPLOYMENT.md](./DEPLOYMENT.md) covers that in full, plus hosting it on free
+tiers (Supabase + Cloudflare Workers) step by step.
 
 ## Checks
 

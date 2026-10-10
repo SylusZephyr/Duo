@@ -15,7 +15,12 @@
     "typecheck": "tsc --noEmit",
     "format:check": "prettier --check .",
     "verify": "npm run lint && npm run typecheck && npm run test",
-    "test:db": "bash scripts/db-test.sh"
+    "test:db": "bash scripts/db-test.sh",
+    "setup": "bash scripts/dev-setup.sh",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:studio": "supabase start && open http://localhost:54323"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

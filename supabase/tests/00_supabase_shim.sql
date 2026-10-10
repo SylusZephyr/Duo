@@ -25,9 +25,16 @@ CREATE SCHEMA IF NOT EXISTS storage;
 
 CREATE TABLE IF NOT EXISTS auth.users (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  instance_id uuid,
+  aud text,
+  role text,
   email text,
+  encrypted_password text,
+  email_confirmed_at timestamptz,
+  raw_app_meta_data jsonb NOT NULL DEFAULT '{}'::jsonb,
   raw_user_meta_data jsonb NOT NULL DEFAULT '{}'::jsonb,
-  created_at timestamptz NOT NULL DEFAULT now()
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
 );
 
 -- The signed-in user id, driven in tests by set_config('request.jwt.claim.sub').
@@ -46,6 +53,20 @@ STABLE
 AS $$
   SELECT COALESCE(NULLIF(current_setting('request.jwt.claim.role', true), ''), 'anon')
 $$;
+
+-- GoTrue keeps one identity row per auth provider per user; the seed writes
+-- them, so the shim needs the shape.
+CREATE TABLE IF NOT EXISTS auth.identities (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  provider_id text NOT NULL,
+  provider text NOT NULL,
+  identity_data jsonb NOT NULL DEFAULT '{}'::jsonb,
+  last_sign_in_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (provider_id, provider)
+);
 
 CREATE TABLE IF NOT EXISTS storage.buckets (
   id text PRIMARY KEY,
