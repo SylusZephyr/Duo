@@ -2,12 +2,23 @@
  * Client-side image pipeline: read EXIF (orientation + GPS) before we discard it,
  * downscale onto a canvas — which strips every metadata block including GPS —
  * and produce a tiny blurred placeholder for instant rendering.
+ *
+ * Every upload produces two files, not one. The full-size image is what you
+ * get when you open a photo; the preview is what a feed card, a grid cell or a
+ * map pin actually needs. Serving the 2560px original into a 400px card was
+ * the single largest consumer of storage egress — roughly an order of
+ * magnitude more bytes than the pixels on screen — and egress is the free
+ * tier's first hard wall. See SCALING.md.
  */
 
 export type PreparedImage = {
   blob: Blob;
   width: number;
   height: number;
+  /** ~800px derivative for feed cards, grids and pins. */
+  previewBlob: Blob;
+  previewWidth: number;
+  previewHeight: number;
   blurDataUrl: string;
   extension: string;
   mimeType: string;
@@ -16,6 +27,25 @@ export type PreparedImage = {
 };
 
 const MAX_EDGE = 2560;
+
+/**
+ * 800px covers a full-width card on a 2x phone and a grid cell on any display.
+ * Above this the saving shrinks while the quality gain is invisible at card
+ * size; below it, opening a card from the feed shows a soft image first.
+ */
+const PREVIEW_EDGE = 800;
+
+/**
+ * The preview's path, derived from the full image's rather than stored.
+ *
+ * Deriving it means no column and no migration, and — more usefully — older
+ * uploads that have no preview simply 404, which the image component treats as
+ * "use the full one". A stored path would have to be backfilled.
+ */
+export function previewPath(path: string): string {
+  const dot = path.lastIndexOf(".");
+  return dot === -1 ? `${path}.preview` : `${path.slice(0, dot)}.preview${path.slice(dot)}`;
+}
 
 export async function prepareImage(file: File): Promise<PreparedImage> {
   const buffer = await file.arrayBuffer();
@@ -34,6 +64,20 @@ export async function prepareImage(file: File): Promise<PreparedImage> {
   context.drawImage(bitmap, 0, 0, width, height);
 
   const blob = await toBlob(canvas, "image/webp", 0.86);
+
+  // Drawn from the original bitmap, not from the full-size canvas: scaling
+  // down twice compounds the resampling blur.
+  const previewScale = Math.min(1, PREVIEW_EDGE / Math.max(bitmap.width, bitmap.height));
+  const previewWidth = Math.max(1, Math.round(bitmap.width * previewScale));
+  const previewHeight = Math.max(1, Math.round(bitmap.height * previewScale));
+  const previewCanvas = document.createElement("canvas");
+  previewCanvas.width = previewWidth;
+  previewCanvas.height = previewHeight;
+  const previewContext = previewCanvas.getContext("2d");
+  if (!previewContext) throw new Error("Your browser could not process that image");
+  previewContext.drawImage(bitmap, 0, 0, previewWidth, previewHeight);
+  const previewBlob = await toBlob(previewCanvas, "image/webp", 0.8);
+
   const blurDataUrl = await makeBlur(bitmap);
   if ("close" in bitmap) bitmap.close();
 
@@ -41,6 +85,9 @@ export async function prepareImage(file: File): Promise<PreparedImage> {
     blob,
     width,
     height,
+    previewBlob,
+    previewWidth,
+    previewHeight,
     blurDataUrl,
     extension: "webp",
     mimeType: "image/webp",

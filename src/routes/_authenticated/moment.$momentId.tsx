@@ -114,6 +114,7 @@ function MomentPage() {
               path={media.storage_path}
               alt={moment?.caption || "Moment"}
               className="mb-3 aspect-[4/5] w-full rounded-3xl"
+              variant="full"
             />
           ))}
 

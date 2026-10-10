@@ -47,6 +47,20 @@ function isH3SwallowedErrorBody(body: string): boolean {
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      const { pathname } = new URL(request.url);
+
+      // Two plain request handlers, answered before the renderer is even
+      // loaded: a cached proxy for public photos and the health check. See
+      // src/lib/public-media.server.ts for why both exist.
+      if (pathname === "/healthz") {
+        const { handleHealth } = await import("@/lib/public-media.server");
+        return await handleHealth();
+      }
+      if (pathname.startsWith("/i/")) {
+        const { handlePublicMedia } = await import("@/lib/public-media.server");
+        return await handlePublicMedia(request);
+      }
+
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);

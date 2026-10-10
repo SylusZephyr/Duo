@@ -24,7 +24,7 @@ Connections and requests are not close to the ceiling. Two other things are.
 
 ---
 
-## 2 · The thing that breaks first: photo egress
+## 2 · The thing that breaks first: photo egress — **now fixed**
 
 This is a photo app. Supabase free gives roughly **5 GB egress/month**, and
 every image view streams from storage.
@@ -34,30 +34,48 @@ every image view streams from storage.
 ```
 
 Images are resized client-side to a 2560px long edge before upload, so a photo
-lands around 400 KB–1 MB. That is **50–120 photo views per user per month**
-before you hit the wall. A couple scrolling their own feed a few times a week
-will pass it.
+lands around 400 KB–1 MB. That was **50–120 photo views per user per month**
+before the wall — a couple scrolling their own feed a few times a week passes
+it. Both halves of the fix are now in place.
 
-**This is the real constraint, and it is fixable for free.**
+### Fixed: an ~800px derivative for anything card-sized
 
-### Fix: put Cloudflare in front of storage
+`prepareImage()` now writes two objects per upload: the 2560px original and an
+800px WebP preview beside it at `<path>.preview.<ext>`. `SignedImage` fetches
+the preview by default and only takes the original where someone is actually
+looking at the photo (`variant="full"` — the moment page and the story
+viewer). A feed card was pulling roughly ten times the bytes its pixels
+needed.
 
-Signed URLs currently go straight to Supabase, so every view is billed egress.
-Serving them through your Cloudflare Worker means the second view of a photo
-is a cache hit and costs Supabase nothing. Cloudflare's cache and bandwidth
-are unmetered on the free plan.
+The preview path is derived, not stored, so there is no column and no
+backfill: uploads from before this change have no preview, the signed URL
+404s, and the component falls back to the original.
 
-The change is a cached image route on the Worker that proxies the storage
-object and sets a long `Cache-Control`. Worth doing **before** launch, not
-after the quota email.
+### Fixed: Cloudflare in front of storage, for public photos
 
-### Fix: stop serving full-size images into thumbnails
+Public pages used to embed signed storage URLs. Those expire, so every
+visitor got a fresh one and **no cache anywhere could hold a single byte** — a
+moment shared a thousand times cost a thousand downloads out of Supabase.
 
-`MAX_EDGE = 2560` is right for the full-screen view and ~6x too big for a feed
-card. Generating a second, smaller derivative at upload time — say 800px —
-and using it for cards and map pins cuts feed egress by roughly an order of
-magnitude. The blur placeholder already in `post_media.blur_data_url` means
-nothing flashes while it loads.
+Explore and public space pages now emit `/i/<storage path>`, handled by
+`handlePublicMedia()` in `src/lib/public-media.server.ts` (dispatched from
+`src/server.ts` before the renderer loads). It checks the path against the
+database with the anonymous key — so row-level security, not our own
+reasoning, decides whether a stranger may have it — then streams the object
+with `max-age=600, s-maxage=3600`. Cloudflare's cache and bandwidth are
+unmetered on the free plan, so repeat views cost Supabase nothing.
+
+**The hour is deliberate.** Not `immutable`, even though the bytes never
+change, because the permission can: un-publishing a moment or a moderator
+taking one down has to actually stop it being served. One hour is the window
+in which a taken-down public photo may still come from an edge cache. If you
+need that to be zero, drop `s-maxage` and accept the egress, or purge the
+Cloudflare cache as part of `moderate_post`.
+
+Private photos are untouched by this — they still go through per-user signed
+URLs, because a shared cache is exactly what they must not have. Private
+egress is bounded by the two people in the space, which is the one case the
+free tier handles comfortably.
 
 ---
 
@@ -155,12 +173,18 @@ Where it already is:
   moves the whole app without touching code.
 - **Every migration is tested** against a real Postgres in CI, so schema
   changes cannot silently break.
+- **Public photos are cached at the edge and served downscaled** (section 2),
+  which turns the first quota you would have hit into a non-event.
+- **`/healthz` answers in under three seconds**, reporting `degraded` rather
+  than hanging when the database is unreachable — so an uptime monitor
+  catches a project paused for inactivity, which on the free tier happens
+  after about a week idle.
 
 Where it will need work, in the order it will bite:
 
 | At roughly              | What gives                  | What to do                                                                                                                                                                                                                                     |
 | ----------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **~500 users**          | Storage egress              | Cloudflare cache + smaller derivatives (section 2)                                                                                                                                                                                             |
+| **~500 users**          | Private-photo egress        | Public photos are already cached and downscaled (section 2); the remaining cost is private feeds. Extend the proxy to signed-in viewers with a per-user cache key, or move to Pro.                                                             |
 | **~200 concurrent**     | Realtime connection cap     | Supabase Pro, or drop realtime on screens that do not need it                                                                                                                                                                                  |
 | **~1,000 users**        | Supabase free DB and egress | Pro at $25/mo — still cheap at that size                                                                                                                                                                                                       |
 | **Any public growth**   | Moderation                  | The queue from item 6 stops being optional                                                                                                                                                                                                     |
@@ -180,6 +204,7 @@ you rely on it with real people:
 
 ```sh
 npm run test:db      # schema correctness, which IS tested
+curl -s https://your-app.workers.dev/healthz   # liveness, including the database
 ```
 
 …then run something like k6 or Artillery against a staging project with a few

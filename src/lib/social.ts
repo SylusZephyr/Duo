@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
-import { prepareImage } from "@/lib/image";
+import { prepareImage, previewPath } from "@/lib/image";
 
 export type Story = {
   id: string;
@@ -69,6 +69,11 @@ export function useAddStory(spaceId: string | undefined) {
         .from("moments")
         .upload(path, prepared.blob, { contentType: prepared.mimeType, upsert: false });
       if (upErr) throw upErr;
+      // Best-effort: a story renders from the preview but falls back to the
+      // full image, so a failed derivative costs bandwidth, not the upload.
+      await supabase.storage
+        .from("moments")
+        .upload(previewPath(path), prepared.previewBlob, { contentType: prepared.mimeType });
       const { error } = await supabase.from("stories").insert({
         space_id: spaceId!,
         author_id: input.userId,
@@ -167,6 +172,11 @@ export function useSendMessage(spaceId: string | undefined) {
           .from("moments")
           .upload(storage_path, prepared.blob, { contentType: prepared.mimeType });
         if (upErr) throw upErr;
+        await supabase.storage
+          .from("moments")
+          .upload(previewPath(storage_path), prepared.previewBlob, {
+            contentType: prepared.mimeType,
+          });
       }
       const { error } = await supabase.from("messages").insert({
         space_id: spaceId!,

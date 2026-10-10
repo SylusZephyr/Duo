@@ -238,6 +238,44 @@ the real origin Cloudflare gave you. Sign-in will not work until you do.
 
 ---
 
+## Step 7 · Point a monitor at `/healthz`
+
+```sh
+curl -s https://your-app.workers.dev/healthz
+# {"status":"ok","database":"ok","latency_ms":84,"checked_at":"..."}
+```
+
+`200 ok` means the Worker is serving **and** the database answered.
+`503 degraded` means the Worker is up and Supabase is not — which is the
+failure that will actually happen to you: a free-tier project pauses after
+about a week with no traffic, and the app then looks broken for reasons the
+dashboard does not volunteer. The check gives up after three seconds rather
+than hanging, so any uptime service can poll it.
+
+Free options: a Cloudflare Worker cron, UptimeRobot, or Better Stack. Polling
+it every five minutes also keeps the Supabase project from idling into a
+pause in the first place.
+
+---
+
+## Step 8 · Set the contact address on the legal pages
+
+`/privacy` and `/terms` are live and linked from the landing page and from
+settings. Both show `VITE_SUPPORT_EMAIL`, falling back to an obvious
+placeholder — set it to an inbox you read, in both `.env` and your GitHub
+secrets:
+
+```
+VITE_SUPPORT_EMAIL=you@your-domain.com
+```
+
+A privacy policy promising that data requests reach `support@example.com` is
+worse than not having one. Read both pages once before launch: they describe
+real behaviour, including that deleting an account leaves shared moments with
+the partner, and you are the one standing behind that.
+
+---
+
 ## Checklist
 
 - [ ] Supabase project created, Free plan
@@ -248,6 +286,10 @@ the real origin Cloudflare gave you. Sign-in will not work until you do.
 - [ ] All six GitHub secrets added
 - [ ] Deploy workflow green
 - [ ] Signed up on the live site and created a space
+- [ ] `/healthz` returns `200 ok` from the deployed origin
+- [ ] An uptime monitor polls it
+- [ ] `VITE_SUPPORT_EMAIL` set, and `/privacy` and `/terms` read through
+- [ ] Export and delete-account tried once on a throwaway account
 
 ## Costs
 

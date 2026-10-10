@@ -165,6 +165,7 @@ function StoryViewer({
           alt={story.caption || "Story"}
           className="absolute inset-0 h-full w-full"
           priority
+          variant="full"
         />
         <div className="absolute inset-x-0 top-0 bg-gradient-to-b from-foreground/70 to-transparent p-4 pt-[max(1rem,env(safe-area-inset-top))]">
           <div className="flex gap-1">

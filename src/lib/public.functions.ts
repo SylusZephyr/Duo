@@ -16,7 +16,8 @@ export type PublicMoment = {
 export const listPublicMoments = createServerFn({ method: "GET" }).handler(
   async (): Promise<PublicMoment[]> => {
     const { createPublicClient } = await import("@/lib/supabase-public.server");
-    const { signPaths } = await import("@/lib/media.server");
+    const { publicMediaUrl } = await import("@/lib/public-media.server");
+    const { previewPath } = await import("@/lib/image");
     const supabase = createPublicClient();
 
     const { data, error } = await supabase
@@ -30,9 +31,6 @@ export const listPublicMoments = createServerFn({ method: "GET" }).handler(
 
     if (error || !data) return [];
 
-    const paths = data.flatMap((row) => (row.post_media ?? []).map((m) => m.storage_path));
-    const signed = await signPaths(paths);
-
     return data.map((row) => ({
       id: row.id,
       caption: row.caption,
@@ -42,10 +40,11 @@ export const listPublicMoments = createServerFn({ method: "GET" }).handler(
       country: row.country,
       created_at: row.created_at,
       space: { name: row.spaces?.name ?? "Two people", handle: row.spaces?.handle ?? null },
+      // Proxy URLs, not signed storage URLs: these are stable, so a CDN can
+      // cache them, and they are grid-sized rather than full resolution.
       photos: (row.post_media ?? [])
         .sort((a, b) => a.position - b.position)
-        .map((m) => signed[m.storage_path])
-        .filter((url): url is string => Boolean(url)),
+        .map((m) => publicMediaUrl(previewPath(m.storage_path))),
     }));
   },
 );
@@ -54,7 +53,8 @@ export const getPublicSpace = createServerFn({ method: "GET" })
   .inputValidator((input) => z.object({ handle: z.string().min(1).max(60) }).parse(input))
   .handler(async ({ data }) => {
     const { createPublicClient } = await import("@/lib/supabase-public.server");
-    const { signPaths } = await import("@/lib/media.server");
+    const { publicMediaUrl } = await import("@/lib/public-media.server");
+    const { previewPath } = await import("@/lib/image");
     const supabase = createPublicClient();
 
     const { data: space } = await supabase
@@ -77,9 +77,6 @@ export const getPublicSpace = createServerFn({ method: "GET" })
       .limit(60);
 
     const rows = posts ?? [];
-    const signed = await signPaths(
-      rows.flatMap((r) => (r.post_media ?? []).map((m) => m.storage_path)),
-    );
 
     return {
       name: space.name,
@@ -96,8 +93,7 @@ export const getPublicSpace = createServerFn({ method: "GET" })
         space: { name: space.name, handle: space.handle },
         photos: (row.post_media ?? [])
           .sort((a, b) => a.position - b.position)
-          .map((m) => signed[m.storage_path])
-          .filter((url): url is string => Boolean(url)),
+          .map((m) => publicMediaUrl(previewPath(m.storage_path))),
       })) as PublicMoment[],
     };
   });

@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { prepareImage, type PreparedImage } from "@/lib/image";
+import { prepareImage, previewPath, type PreparedImage } from "@/lib/image";
 import { reverseGeocode, type PlaceHit } from "@/lib/maps.functions";
 import { useMe } from "@/lib/queries";
 import {
@@ -186,6 +186,15 @@ function ComposePage() {
             upsert: false,
           });
         if (uploadError) throw uploadError;
+
+        // The feed, the grid and the map all render the preview; only opening
+        // a photo fetches the full one. Deliberately not fatal — a moment
+        // without a derivative still works, just costs more bandwidth.
+        await supabase.storage
+          .from("moments")
+          .upload(previewPath(path), draft.prepared.previewBlob, {
+            contentType: draft.prepared.mimeType,
+          });
 
         const { error: mediaError } = await supabase.from("post_media").insert({
           post_id: post.id,
