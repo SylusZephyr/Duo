@@ -1181,13 +1181,28 @@ export type Database = {
       };
       join_space_by_code: { Args: { _code: string }; Returns: string };
       rotate_invite_code: { Args: { _space_id: string }; Returns: string };
+      space_stats: {
+        Args: { _space_id: string };
+        Returns: Database["public"]["CompositeTypes"]["space_stats_result"];
+      };
       space_member_count: { Args: { _space_id: string }; Returns: number };
     };
     Enums: {
       app_role: "admin" | "moderator" | "user";
     };
     CompositeTypes: {
-      [_ in never]: never;
+      space_stats_result: {
+        moments: number;
+        cities: number;
+        countries: number;
+        journal_entries: number;
+        milestones: number;
+        places_pinned: number;
+        bucket_done: number;
+        bucket_total: number;
+        first_moment_at: string | null;
+        posting_dates: string[];
+      };
     };
   };
 };

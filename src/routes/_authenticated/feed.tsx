@@ -1,12 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Copy, Images, Sparkle } from "lucide-react";
 import { toast } from "sonner";
+import { useEffect, useRef } from "react";
 
 import { AppShell } from "@/components/app-shell";
 import { MomentCard } from "@/components/moment-card";
 import { EmptyState, ErrorState, FeedSkeleton } from "@/components/states";
 import { daysBetween } from "@/lib/format";
-import { useDailyPrompt, useMe, useMoments } from "@/lib/queries";
+import {
+  MOMENTS_PAGE_SIZE,
+  flattenMoments,
+  useDailyPrompt,
+  useMe,
+  useMoments,
+} from "@/lib/queries";
 import { useSpaceRealtime } from "@/lib/realtime";
 import { useRequireSpace } from "@/lib/use-require-space";
 
@@ -30,10 +37,35 @@ function FeedPage() {
   const { data: me } = useMe();
   const { data, isLoading } = useRequireSpace();
   const spaceId = data?.space.id;
-  const { data: moments, isLoading: loadingMoments, isError, refetch } = useMoments(spaceId);
+  const {
+    data: momentPages,
+    isLoading: loadingMoments,
+    isError,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useMoments(spaceId);
+  const moments = flattenMoments(momentPages);
   const { data: prompt } = useDailyPrompt(spaceId);
 
   useSpaceRealtime(spaceId);
+
+  // Load the next page as the reader reaches the bottom, rather than making
+  // them hunt for a button.
+  const sentinel = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const node = sentinel.current;
+    if (!node || !hasNextPage) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) void fetchNextPage();
+      },
+      { rootMargin: "600px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const days = data?.space.anniversary_date ? daysBetween(data.space.anniversary_date) : null;
   const alone = (data?.members.length ?? 0) < 2;
@@ -81,7 +113,7 @@ function FeedPage() {
         />
       ) : isLoading || loadingMoments ? (
         <FeedSkeleton />
-      ) : (moments ?? []).length === 0 ? (
+      ) : moments.length === 0 ? (
         <EmptyState
           icon={<Images className="mx-auto size-7" />}
           title="Nothing here yet"
@@ -97,7 +129,7 @@ function FeedPage() {
         />
       ) : (
         <div className="space-y-8">
-          {groupByMonth(moments ?? []).map(([label, group]) => (
+          {groupByMonth(moments).map(([label, group]) => (
             <section key={label}>
               <h2 className="sticky top-0 z-10 -mx-1 mb-3 bg-background/85 px-1 py-2 text-[11px] uppercase tracking-[0.22em] text-muted-foreground backdrop-blur">
                 {label}
@@ -120,6 +152,16 @@ function FeedPage() {
               </div>
             </section>
           ))}
+
+          <div ref={sentinel} aria-hidden="true" />
+
+          {isFetchingNextPage ? (
+            <FeedSkeleton count={1} />
+          ) : !hasNextPage && moments.length > MOMENTS_PAGE_SIZE ? (
+            <p className="py-6 text-center text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+              That's everything, so far
+            </p>
+          ) : null}
         </div>
       )}
     </AppShell>

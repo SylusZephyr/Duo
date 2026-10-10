@@ -14,7 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { evaluateBadges, postingStreak, type BadgeKey } from "@/lib/achievements";
 import { daysBetween, formatDay } from "@/lib/format";
 import { badgeTitle, useEarnedBadges, useRecordBadges } from "@/lib/notifications";
-import { useBucketList, useJournal, useMe, useMilestones, useMoments } from "@/lib/queries";
+import { useBucketList, useJournal, useMe, useMilestones, useSpaceStats } from "@/lib/queries";
 import { useRequireSpace } from "@/lib/use-require-space";
 
 export const Route = createFileRoute("/_authenticated/us")({
@@ -38,7 +38,7 @@ function UsPage() {
   const queryClient = useQueryClient();
   const { data: me } = useMe();
   const { data } = useRequireSpace();
-  const { data: moments } = useMoments(data?.space.id);
+  const { data: stats } = useSpaceStats(data?.space.id);
   const { data: entries } = useJournal(data?.space.id);
   const { data: milestones } = useMilestones(data?.space.id);
   const { data: bucket } = useBucketList(data?.space.id);
@@ -52,7 +52,9 @@ function UsPage() {
   const [handle, setHandle] = useState(data?.space.handle ?? "");
   const [busy, setBusy] = useState(false);
 
-  const streak = useMemo(() => postingStreak((moments ?? []).map((m) => m.taken_at)), [moments]);
+  // The dates come from the database already deduplicated and newest-first;
+  // the streak itself is still worked out by the function the tests cover.
+  const streak = useMemo(() => postingStreak(stats?.posting_dates ?? []), [stats]);
 
   async function addWish() {
     if (!me || !data || wish.trim().length === 0) return;
@@ -92,19 +94,18 @@ function UsPage() {
   }
 
   const badges = useMemo(() => {
-    const list = moments ?? [];
     const years = data?.space.anniversary_date
       ? Math.floor(daysBetween(data.space.anniversary_date) / 365)
       : 0;
     return evaluateBadges({
-      moments: list.length,
-      cities: new Set(list.map((m) => m.city).filter(Boolean)).size,
-      countries: new Set(list.map((m) => m.country).filter(Boolean)).size,
-      entries: (entries ?? []).length,
-      streak: postingStreak(list.map((m) => m.taken_at)),
+      moments: stats?.moments ?? 0,
+      cities: stats?.cities ?? 0,
+      countries: stats?.countries ?? 0,
+      entries: stats?.journal_entries ?? (entries ?? []).length,
+      streak,
       years,
     });
-  }, [moments, entries, data?.space.anniversary_date]);
+  }, [stats, entries, streak, data?.space.anniversary_date]);
 
   const { data: recorded } = useEarnedBadges(data?.space.id);
   const recordBadges = useRecordBadges(data?.space.id, me?.id);
@@ -202,11 +203,8 @@ function UsPage() {
   return (
     <AppShell title="Us" subtitle={days !== null ? `Day ${days.toLocaleString()}` : "Your story"}>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Stat label="Moments" value={(moments ?? []).length} />
-        <Stat
-          label="Places"
-          value={new Set((moments ?? []).map((m) => m.city).filter(Boolean)).size}
-        />
+        <Stat label="Moments" value={stats?.moments ?? 0} />
+        <Stat label="Places" value={stats?.cities ?? 0} />
         <Stat label="Day streak" value={streak} />
         <Stat label="Badges" value={earned.length} />
       </div>

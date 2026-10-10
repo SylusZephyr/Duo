@@ -12,7 +12,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { prepareImage, type PreparedImage } from "@/lib/image";
 import { reverseGeocode, type PlaceHit } from "@/lib/maps.functions";
-import { notifyPartner } from "@/lib/notify";
 import { useMe } from "@/lib/queries";
 import {
   ALLOWED_IMAGE_TYPES,
@@ -208,14 +207,9 @@ function ComposePage() {
           .insert(input.tags.map((tag) => ({ post_id: post.id, tag })));
       }
 
-      await notifyPartner({
-        spaceId: data.space.id,
-        actorId: me.id,
-        kind: "moment",
-        title: "A new moment",
-        body: input.caption.slice(0, 120) || "Photos were added to your space",
-        link: `/moment/${post.id}`,
-      });
+      // The partner is notified by a trigger on posts — see
+      // supabase/migrations/20261009090000_notifications_achievements_invites.sql.
+      // Notifying from here as well would deliver it twice.
 
       await queryClient.invalidateQueries();
       toast.success(isPublic ? "Shared with the world" : "Saved to your space");

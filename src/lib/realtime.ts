@@ -3,7 +3,13 @@ import { useEffect } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 
-const SPACE_TABLES = ["posts", "journal_entries", "milestones", "prompt_answers"] as const;
+const SPACE_TABLES = [
+  "posts",
+  "journal_entries",
+  "milestones",
+  "prompt_answers",
+  "bucket_list",
+] as const;
 const POST_TABLES = ["post_media", "post_reactions", "post_comments"] as const;
 
 /**
@@ -24,6 +30,12 @@ export function useSpaceRealtime(spaceId: string | undefined) {
         { event: "*", schema: "public", table, filter: `space_id=eq.${spaceId}` },
         () => {
           queryClient.invalidateQueries({ queryKey: [tableToKey(table), spaceId] });
+          // A new or deleted post changes the map pins and the /us counts too,
+          // and neither is derived from the feed cache any more.
+          if (table === "posts") {
+            queryClient.invalidateQueries({ queryKey: ["map-moments", spaceId] });
+          }
+          queryClient.invalidateQueries({ queryKey: ["space-stats", spaceId] });
         },
       );
     }

@@ -208,6 +208,7 @@ export function useRecordBadges(spaceId: string | undefined, userId: string | un
     onSuccess: (recorded) => {
       if (recorded.length === 0) return;
       queryClient.invalidateQueries({ queryKey: ["achievements", spaceId] });
+      queryClient.invalidateQueries({ queryKey: ["space-stats", spaceId] });
       queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
       queryClient.invalidateQueries({ queryKey: ["notifications-unread", userId] });
     },

@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatKm, pathLengthKm } from "@/lib/geo";
 import { formatShortDay } from "@/lib/format";
 import type { PlaceHit } from "@/lib/maps.functions";
-import { useMe, useMoments, useSignedUrls, useWishlist } from "@/lib/queries";
+import { useMapMoments, useMe, useSignedUrls, useWishlist } from "@/lib/queries";
 import { useRequireSpace } from "@/lib/use-require-space";
 import { cn } from "@/lib/utils";
 
@@ -38,7 +38,7 @@ function MapPage() {
   const { data: me } = useMe();
   const { data } = useRequireSpace();
   const spaceId = data?.space.id;
-  const { data: moments } = useMoments(spaceId);
+  const { data: located = [] } = useMapMoments(spaceId);
   const { data: wishlist } = useWishlist(spaceId);
 
   const [year, setYear] = useState<string>("all");
@@ -49,11 +49,6 @@ function MapPage() {
   const [focus, setFocus] = useState<MapFocus>(null);
   const [dream, setDream] = useState<PlaceHit | null>(null);
   const [savingDream, setSavingDream] = useState(false);
-
-  const located = useMemo(
-    () => (moments ?? []).filter((moment) => moment.lat !== null && moment.lng !== null),
-    [moments],
-  );
 
   const years = useMemo(
     () =>
@@ -77,8 +72,8 @@ function MapPage() {
   const points = useMemo<MapPoint[]>(() => {
     const visited: MapPoint[] = inYear.map((moment) => ({
       id: moment.id,
-      lat: moment.lat!,
-      lng: moment.lng!,
+      lat: moment.lat,
+      lng: moment.lng,
       label: moment.place_name ?? moment.city ?? "Somewhere",
       photoUrl: (moment.media[0] ? signed?.[moment.media[0].storage_path] : null) ?? null,
       kind: "visited",
@@ -101,7 +96,7 @@ function MapPage() {
     return inYear
       .slice()
       .sort((a, b) => a.taken_at.localeCompare(b.taken_at))
-      .map((moment) => ({ lat: moment.lat!, lng: moment.lng! }));
+      .map((moment) => ({ lat: moment.lat, lng: moment.lng }));
   }, [inYear, journey]);
 
   const km = useMemo(
@@ -110,7 +105,7 @@ function MapPage() {
         inYear
           .slice()
           .sort((a, b) => a.taken_at.localeCompare(b.taken_at))
-          .map((m) => ({ lat: m.lat!, lng: m.lng! })),
+          .map((m) => ({ lat: m.lat, lng: m.lng })),
       ),
     [inYear],
   );
