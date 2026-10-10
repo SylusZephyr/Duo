@@ -142,7 +142,9 @@ export function useUnreadMessages(userId: string | undefined) {
       if (error) return 0;
       return count ?? 0;
     },
-    refetchInterval: 30_000,
+    // No polling: useSocialRealtime invalidates this key whenever a message
+    // changes. A 30s interval on top of that was ~3k redundant queries per
+    // user per day, and the realtime path is faster anyway.
   });
 }
 

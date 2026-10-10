@@ -35,6 +35,8 @@ Sign in as `alex@example.com` or `sam@example.com`, both `password123`.
 
 [DEPLOYMENT.md](./DEPLOYMENT.md) covers that in full, plus hosting it on free
 tiers (Supabase + Cloudflare Workers) step by step.
+[SCALING.md](./SCALING.md) is what to do before real users, and what actually
+breaks first at a hundred of them.
 
 ## Checks
 

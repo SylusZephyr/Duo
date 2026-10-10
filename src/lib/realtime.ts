@@ -40,11 +40,20 @@ export function useSpaceRealtime(spaceId: string | undefined) {
       );
     }
 
+    // Filtered by space, like the tables above. Without the filter every
+    // client subscribes to every reaction and comment in the database, and
+    // the realtime server evaluates row-level security once per subscriber
+    // per change — work that grows with users x writes rather than with
+    // either alone. These tables carry space_id for exactly this reason.
     for (const table of POST_TABLES) {
-      channel.on("postgres_changes", { event: "*", schema: "public", table }, () => {
-        queryClient.invalidateQueries({ queryKey: ["moments", spaceId] });
-        queryClient.invalidateQueries({ queryKey: ["comments"] });
-      });
+      channel.on(
+        "postgres_changes",
+        { event: "*", schema: "public", table, filter: `space_id=eq.${spaceId}` },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["moments", spaceId] });
+          queryClient.invalidateQueries({ queryKey: ["comments"] });
+        },
+      );
     }
 
     channel.subscribe();
