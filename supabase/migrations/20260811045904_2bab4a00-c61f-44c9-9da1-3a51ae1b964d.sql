@@ -1,0 +1,8 @@
+REVOKE EXECUTE ON FUNCTION public.is_space_member(UUID, UUID) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.space_member_count(UUID) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.can_read_post(UUID, UUID) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.is_post_public(UUID) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.touch_updated_at() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.join_space_by_code(TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.join_space_by_code(TEXT) TO authenticated;

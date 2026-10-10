@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.can_access_storage_path(TEXT, UUID) FROM anon, authenticated, PUBLIC;

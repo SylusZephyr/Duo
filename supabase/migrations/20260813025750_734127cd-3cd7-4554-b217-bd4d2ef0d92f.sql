@@ -1,0 +1,1 @@
+DELETE FROM public.posts WHERE caption = 'Our first test moment';

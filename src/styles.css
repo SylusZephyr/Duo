@@ -1,0 +1,376 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Duo design system — "Candy Light".
+ * Bright, airy canvas with candy-pink / cornflower / honey accents, deep
+ * gradient washes and soft elevated surfaces. Sora for display, Manrope body.
+ */
+
+@theme inline {
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 14px);
+  --radius-4xl: calc(var(--radius) + 22px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  /* Brand ramp */
+  --color-candy: var(--candy);
+  --color-candy-foreground: var(--candy-foreground);
+  --color-candy-soft: var(--candy-soft);
+  --color-blueberry: var(--blueberry);
+  --color-blueberry-soft: var(--blueberry-soft);
+  --color-honey: var(--honey);
+  --color-honey-soft: var(--honey-soft);
+  --color-mint: var(--mint);
+  --color-ink: var(--ink);
+  --color-ash: var(--ash);
+  /* Back-compat aliases so older screens keep rendering */
+  --color-ember: var(--candy);
+  --color-ember-foreground: var(--candy-foreground);
+  --color-gold: var(--honey-ink);
+}
+
+:root {
+  --radius: 1.1rem;
+
+  --background: #ffffff;
+  --foreground: #1a1024;
+  --card: #ffffff;
+  --card-foreground: #1a1024;
+  --popover: #ffffff;
+  --popover-foreground: #1a1024;
+
+  --primary: #ff4d8d;
+  --primary-foreground: #ffffff;
+  --secondary: #fdf1f6;
+  --secondary-foreground: #55304a;
+  --muted: #f6f4fb;
+  --muted-foreground: #7a6b86;
+  --accent: #eef1ff;
+  --accent-foreground: #34366b;
+  --destructive: #e5484d;
+  --destructive-foreground: #ffffff;
+  --border: #efe9f4;
+  --input: #e9e2f0;
+  --ring: #ff4d8d80;
+
+  --candy: #ff4d8d;
+  --candy-foreground: #ffffff;
+  --candy-soft: #fff0f5;
+  --blueberry: #6c8cff;
+  --blueberry-soft: #eef1ff;
+  --honey: #ffd166;
+  --honey-soft: #fff8e6;
+  --honey-ink: #b8811a;
+  --mint: #43d6a8;
+  --ink: #1a1024;
+  --ash: #faf7fc;
+
+  --chart-1: #ff4d8d;
+  --chart-2: #6c8cff;
+  --chart-3: #ffd166;
+  --chart-4: #43d6a8;
+  --chart-5: #b070ff;
+
+  --gradient-candy: linear-gradient(135deg, #ff4d8d 0%, #ff7a45 55%, #ffd166 100%);
+  --gradient-dream: linear-gradient(135deg, #6c8cff 0%, #b070ff 50%, #ff4d8d 100%);
+  --gradient-glass: linear-gradient(
+    160deg,
+    color-mix(in oklab, #ffffff 92%, transparent),
+    color-mix(in oklab, #ffffff 62%, transparent)
+  );
+  --shadow-soft: 0 2px 8px -2px rgb(26 16 36 / 0.06), 0 12px 32px -18px rgb(26 16 36 / 0.16);
+  --shadow-lift: 0 4px 12px -4px rgb(26 16 36 / 0.08), 0 24px 48px -24px rgb(255 77 141 / 0.34);
+  --shadow-glow: 0 12px 40px -12px rgb(255 77 141 / 0.5);
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1a1024;
+  --sidebar-primary: #ff4d8d;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #fdf1f6;
+  --sidebar-accent-foreground: #55304a;
+  --sidebar-border: #efe9f4;
+  --sidebar-ring: #ff4d8d80;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #100b18;
+  --foreground: #f7f3fb;
+  --card: #191223;
+  --card-foreground: #f7f3fb;
+  --popover: #191223;
+  --popover-foreground: #f7f3fb;
+  --secondary: #241a31;
+  --secondary-foreground: #f7f3fb;
+  --muted: #221930;
+  --muted-foreground: #a595b4;
+  --accent: #24224a;
+  --accent-foreground: #e6e8ff;
+  --border: #ffffff1f;
+  --input: #ffffff26;
+  --candy-soft: #ff4d8d1f;
+  --blueberry-soft: #6c8cff1f;
+  --honey-soft: #ffd1661f;
+  --honey-ink: #ffd166;
+  --ash: #150f1f;
+  --sidebar: #191223;
+  --sidebar-foreground: #f7f3fb;
+  --sidebar-accent: #241a31;
+  --sidebar-accent-foreground: #f7f3fb;
+  --sidebar-border: #ffffff1f;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv01";
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+}
+
+@utility font-display {
+  font-family: var(--font-display);
+}
+
+@utility text-balance-tight {
+  text-wrap: balance;
+}
+
+/* Warm aurora wash used behind headers and hero surfaces. */
+@utility aurora {
+  background-image:
+    radial-gradient(52% 42% at 12% 0%, color-mix(in oklab, var(--candy) 26%, transparent), transparent 70%),
+    radial-gradient(46% 40% at 92% 6%, color-mix(in oklab, var(--blueberry) 26%, transparent), transparent 70%),
+    radial-gradient(40% 34% at 60% 100%, color-mix(in oklab, var(--honey) 24%, transparent), transparent 72%);
+}
+
+@utility grain {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    color-mix(in oklab, var(--foreground) 6%, transparent) 1px,
+    transparent 0
+  );
+  background-size: 4px 4px;
+}
+
+@utility hide-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility bg-gradient-candy {
+  background-image: var(--gradient-candy);
+}
+
+@utility bg-gradient-dream {
+  background-image: var(--gradient-dream);
+}
+
+@utility text-gradient-candy {
+  background-image: var(--gradient-candy);
+  background-clip: text;
+  color: transparent;
+}
+
+@utility shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+
+@utility shadow-lift {
+  box-shadow: var(--shadow-lift);
+}
+
+@utility shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
+
+/* Elevated surface with a hairline highlight — the base of every card. */
+@utility surface {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+}
+
+@utility press {
+  transition:
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.18s ease;
+  &:active {
+    transform: scale(0.96);
+  }
+}
+
+@utility lift {
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.28s ease;
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lift);
+  }
+}
+
+/* Gradient ring used for story avatars. */
+@utility story-ring {
+  background-image: var(--gradient-candy);
+  padding: 2.5px;
+}
+
+@keyframes duo-burst {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+@utility duo-burst {
+  animation: duo-burst 0.7s ease-out forwards;
+  filter: drop-shadow(0 10px 26px rgb(255 77 141 / 0.45));
+}
+
+@keyframes duo-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility duo-rise {
+  animation: duo-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes duo-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  60% {
+    transform: scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility duo-pop {
+  animation: duo-pop 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes duo-shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@utility duo-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--candy) 16%, transparent),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: duo-shimmer 1.6s linear infinite;
+}
+
+@keyframes duo-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@utility duo-float {
+  animation: duo-float 4.5s ease-in-out infinite;
+}
+
+@keyframes duo-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@utility duo-progress {
+  transform-origin: left;
+  animation: duo-progress linear forwards;
+}
