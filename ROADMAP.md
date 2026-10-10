@@ -116,19 +116,22 @@ A transform/CDN layer is the fix, when the bill says so.
 
 ## Known issues not yet addressed
 
-- **`npm audit` reports 7 vulnerabilities (3 critical, 3 high).** Not fixed
-  because `npm audit fix` can move pinned versions out from under the Lovable
-  editor. Each needs checking for a reachable path first.
-- **`.env` is committed.** Only publishable keys, which is how Lovable works,
-  but the Google Maps browser key needs HTTP-referrer restrictions set in GCP
-  or it can be used from anywhere and billed to this project.
+- **`npm audit` reports vulnerabilities in transitive dependencies.** Each
+  needs checking for a reachable path before bumping anything; `npm audit fix`
+  on a lockfile this deep is as likely to break the build as to help.
+- **The Google Maps keys need restricting.** The browser key ships in the page
+  and cannot be hidden, so it needs an HTTP-referrer restriction in the Google
+  Cloud console or it can be used from anywhere and billed to this project.
+  The server key should be a separate, IP-restricted key rather than a copy of
+  the browser one.
 - **`albums` / `album_posts` have no UI.** Either build it or drop the tables;
   dead schema invites someone to assume it works.
 - **No load test.** Nothing here has been run against a realistic dataset on a
   real Supabase instance. "Ready for thousands of couples" cannot honestly be
   claimed until it has been.
-- **No error budget or monitoring.** Errors go to Lovable's reporter. There is
-  no alerting, no uptime check, and no dashboard.
+- **No error budget or monitoring.** `src/lib/error-reporting.ts` normalises
+  errors and logs them, with a `setErrorReporter` hook and nothing plugged
+  into it. There is no alerting, no uptime check, and no dashboard.
 
 ## Running the checks
 

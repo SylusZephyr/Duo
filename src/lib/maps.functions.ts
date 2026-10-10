@@ -1,7 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-const GATEWAY = "https://connector-gateway.lovable.dev/google_maps";
+/**
+ * Google Maps, called directly.
+ *
+ * These used to go through a hosted connector gateway that proxied the same
+ * two Google endpoints and authenticated with a platform key. Talking to
+ * Google ourselves removes that dependency; the only thing needed now is a
+ * Maps API key of your own in GOOGLE_MAPS_API_KEY, with the Places API (New)
+ * and Geocoding API enabled on the project.
+ */
+const PLACES_ENDPOINT = "https://places.googleapis.com/v1/places:searchText";
+const GEOCODE_ENDPOINT = "https://maps.googleapis.com/maps/api/geocode/json";
 
 export type PlaceHit = {
   id: string;
@@ -13,33 +23,31 @@ export type PlaceHit = {
   country: string | null;
 };
 
-function gatewayHeaders() {
-  const lovableKey = process.env["LOVABLE_API_KEY"];
-  const mapsKey = process.env["GOOGLE_MAPS_API_KEY"];
-  if (!lovableKey || !mapsKey) throw new Error("Maps is not configured yet");
-  return {
-    Authorization: `Bearer ${lovableKey}`,
-    "X-Connection-Api-Key": mapsKey,
-    "Content-Type": "application/json",
-  };
+function mapsKey() {
+  const key = process.env["GOOGLE_MAPS_API_KEY"];
+  if (!key) throw new Error("Maps is not configured yet");
+  return key;
 }
 
 async function readError(response: Response) {
   const body = await response.text();
-  console.error(`Google Maps gateway failed [${response.status}]: ${body}`);
+  console.error(`Google Maps request failed [${response.status}]: ${body}`);
   if (response.status === 403) {
-    throw new Error("Maps request was denied. Check the Google Maps connection.");
+    throw new Error("Maps request was denied. Check the Google Maps API key and its restrictions.");
   }
   throw new Error(`Maps request failed (${response.status})`);
 }
 
+/** A server key must not be sent from a browser, so both calls stay server-side. */
 export const searchPlaces = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ query: z.string().trim().min(2).max(120) }).parse(input))
   .handler(async ({ data }): Promise<PlaceHit[]> => {
-    const response = await fetch(`${GATEWAY}/places/v1/places:searchText`, {
+    const response = await fetch(PLACES_ENDPOINT, {
       method: "POST",
       headers: {
-        ...gatewayHeaders(),
+        "X-Goog-Api-Key": mapsKey(),
+        "Content-Type": "application/json",
+        // Places (New) bills by the fields requested, so ask for only these.
         "X-Goog-FieldMask":
           "places.id,places.displayName,places.formattedAddress,places.location,places.addressComponents",
       },
@@ -76,10 +84,11 @@ export const searchPlaces = createServerFn({ method: "POST" })
 export const reverseGeocode = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ lat: z.number(), lng: z.number() }).parse(input))
   .handler(async ({ data }): Promise<PlaceHit | null> => {
-    const response = await fetch(
-      `${GATEWAY}/maps/api/geocode/json?latlng=${data.lat},${data.lng}`,
-      { headers: gatewayHeaders() },
-    );
+    const url = new URL(GEOCODE_ENDPOINT);
+    url.searchParams.set("latlng", `${data.lat},${data.lng}`);
+    url.searchParams.set("key", mapsKey());
+
+    const response = await fetch(url);
     if (!response.ok) await readError(response);
 
     const json = (await response.json()) as {

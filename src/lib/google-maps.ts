@@ -7,8 +7,9 @@ export function loadGoogleMaps(): Promise<any> {
   if (w.google?.maps) return Promise.resolve(w.google.maps);
   if (loader) return loader;
 
-  const key = import.meta.env["VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY"];
-  const channel = import.meta.env["VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_ID"];
+  // A browser key is public by nature — restrict it by HTTP referrer in the
+  // Google Cloud console rather than trying to hide it.
+  const key = import.meta.env["VITE_GOOGLE_MAPS_BROWSER_KEY"];
 
   loader = new Promise((resolve, reject) => {
     if (!key) {
@@ -17,9 +18,7 @@ export function loadGoogleMaps(): Promise<any> {
     }
     w.__duoInitMaps = () => resolve(w.google.maps);
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&loading=async&callback=__duoInitMaps${
-      channel ? `&channel=${channel}` : ""
-    }`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&loading=async&callback=__duoInitMaps`;
     script.async = true;
     script.onerror = () => reject(new Error("Maps failed to load"));
     document.head.appendChild(script);

@@ -16,6 +16,11 @@ dist-ssr
 .nitro
 *.local
 
+# Environment — real values never get committed; see .env.example
+.env
+.env.*
+!.env.example
+
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars

@@ -24,6 +24,7 @@ import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedMapRouteImport } from './routes/_authenticated/map'
 import { Route as AuthenticatedStartRouteImport } from './routes/_authenticated/start'
 import { Route as AuthenticatedUsRouteImport } from './routes/_authenticated/us'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as CHandleRouteImport } from './routes/c.$handle'
 import { Route as AuthenticatedMomentMomentIdRouteImport } from './routes/_authenticated/moment.$momentId'
 
@@ -101,6 +102,11 @@ const AuthenticatedUsRoute = AuthenticatedUsRouteImport.update({
   path: '/us',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRoute,
+} as any)
 const CHandleRoute = CHandleRouteImport.update({
   id: '/c/$handle',
   path: '/c/$handle',
@@ -115,7 +121,7 @@ const AuthenticatedMomentMomentIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/explore': typeof ExploreRoute
   '/reset-password': typeof ResetPasswordRoute
   '/chat': typeof AuthenticatedChatRoute
@@ -128,12 +134,13 @@ export interface FileRoutesByFullPath {
   '/map': typeof AuthenticatedMapRoute
   '/start': typeof AuthenticatedStartRoute
   '/us': typeof AuthenticatedUsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/c/$handle': typeof CHandleRoute
   '/moment/$momentId': typeof AuthenticatedMomentMomentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/explore': typeof ExploreRoute
   '/reset-password': typeof ResetPasswordRoute
   '/chat': typeof AuthenticatedChatRoute
@@ -146,6 +153,7 @@ export interface FileRoutesByTo {
   '/map': typeof AuthenticatedMapRoute
   '/start': typeof AuthenticatedStartRoute
   '/us': typeof AuthenticatedUsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/c/$handle': typeof CHandleRoute
   '/moment/$momentId': typeof AuthenticatedMomentMomentIdRoute
 }
@@ -153,7 +161,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/explore': typeof ExploreRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/chat': typeof AuthenticatedChatRoute
@@ -166,6 +174,7 @@ export interface FileRoutesById {
   '/_authenticated/map': typeof AuthenticatedMapRoute
   '/_authenticated/start': typeof AuthenticatedStartRoute
   '/_authenticated/us': typeof AuthenticatedUsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/c/$handle': typeof CHandleRoute
   '/_authenticated/moment/$momentId': typeof AuthenticatedMomentMomentIdRoute
 }
@@ -186,6 +195,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/start'
     | '/us'
+    | '/auth/callback'
     | '/c/$handle'
     | '/moment/$momentId'
   fileRoutesByTo: FileRoutesByTo
@@ -204,6 +214,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/start'
     | '/us'
+    | '/auth/callback'
     | '/c/$handle'
     | '/moment/$momentId'
   id:
@@ -223,6 +234,7 @@ export interface FileRouteTypes {
     | '/_authenticated/map'
     | '/_authenticated/start'
     | '/_authenticated/us'
+    | '/auth/callback'
     | '/c/$handle'
     | '/_authenticated/moment/$momentId'
   fileRoutesById: FileRoutesById
@@ -230,7 +242,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   ExploreRoute: typeof ExploreRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   CHandleRoute: typeof CHandleRoute
@@ -343,6 +355,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/c/$handle': {
       id: '/c/$handle'
       path: '/c/$handle'
@@ -391,10 +410,20 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AuthRouteChildren {
+  AuthCallbackRoute: typeof AuthCallbackRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthCallbackRoute: AuthCallbackRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   ExploreRoute: ExploreRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   CHandleRoute: CHandleRoute,

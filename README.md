@@ -5,18 +5,33 @@ places you have been, a journal with sealed letters you can date into the
 future, a chat, games, countdowns and the milestones worth keeping — all
 private between the two of you, until you choose to make something public.
 
-**Live app**: https://evasive.lovable.app
-
 See [ROADMAP.md](./ROADMAP.md) for where this is and what is still missing.
 
 ## Stack
 
 TanStack Start (React 19) · Tailwind 4 · shadcn/ui · Supabase (Postgres, Auth,
-Storage, Realtime) · deployed on Cloudflare via Nitro.
+Storage, Realtime) · Google Maps · built with Nitro, deployable to Cloudflare.
+
+There is no platform SDK in the dependency tree. The Vite config is written out
+in full, Google sign-in goes through Supabase Auth, the map calls Google's APIs
+directly from server functions, and error reporting is a local module with one
+hook to plug a real service into. Nothing here depends on a hosting vendor.
 
 Most of the product rules live in the database: row-level security scopes every
 table to a space, a space is capped at two members by both the join RPC and the
 policy, and notifications are fanned out by triggers rather than by the client.
+
+## Setup
+
+```sh
+npm install
+cp .env.example .env    # then fill it in
+npm run dev
+```
+
+`.env.example` documents every variable and why the two Google Maps keys are
+separate. Supabase Auth also needs Google enabled as a provider, with
+`https://your-domain/auth/callback` in its redirect allow-list.
 
 ## Checks
 
@@ -38,11 +53,12 @@ Add one, run `npm run test:db` until it is green, then apply it to the project
 with `supabase db push`. **A migration in the repo is not a migration in
 production** — the schema tests prove it applies, not that it has been applied.
 
-## Development
+## Deploying
 
-You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+`npm run build` produces a Nitro bundle under `.output`, targeting
+`cloudflare-module` by default. Set `NITRO_PRESET` to build for anywhere else
+Nitro supports — `node-server`, `vercel`, `netlify` and so on — without
+touching the config.
 
-```sh
-npm install
-npm run dev
-```
+Environment variables come from the host's own settings, not from `.env`,
+which is gitignored.

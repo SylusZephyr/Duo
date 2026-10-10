@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { lovable } from "@/integrations/lovable/index";
 import { MIN_PASSWORD_LENGTH, describePassword } from "@/lib/password";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -85,16 +84,21 @@ function AuthPage() {
     }
   }
 
+  /**
+   * Supabase handles the Google handshake itself: this redirects away to
+   * Google and comes back to /auth/callback with the code to exchange, so
+   * there is nothing to navigate to here on the happy path.
+   */
   async function google() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
-    if (result.error) {
+    if (error) {
       toast.error("Google sign-in didn't work. Try again.");
-      return;
     }
-    if (result.redirected) return;
-    navigate({ to: "/feed", replace: true });
   }
 
   return (
