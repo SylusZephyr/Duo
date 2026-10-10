@@ -255,38 +255,6 @@ export function usePromptAnswers(spaceId: string | undefined, promptId: string |
   });
 }
 
-export function useNotifications(userId: string | undefined) {
-  return useQuery({
-    queryKey: ["notifications", userId],
-    enabled: Boolean(userId),
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("notifications")
-        .select("id, kind, title, body, link, read_at, created_at")
-        .order("created_at", { ascending: false })
-        .limit(50);
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-}
-
-export function useNotificationPrefs(userId: string | undefined) {
-  return useQuery({
-    queryKey: ["notification_prefs", userId],
-    enabled: Boolean(userId),
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("notification_prefs")
-        .select("*")
-        .eq("user_id", userId!)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-  });
-}
-
 export function useComments(postId: string | undefined) {
   return useQuery({
     queryKey: ["comments", postId],

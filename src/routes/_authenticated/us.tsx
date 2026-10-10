@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { Award, Check, Copy, LogOut, Plus } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/app-shell";
@@ -11,8 +11,9 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { evaluateBadges, postingStreak } from "@/lib/achievements";
+import { evaluateBadges, postingStreak, type BadgeKey } from "@/lib/achievements";
 import { daysBetween, formatDay } from "@/lib/format";
+import { badgeTitle, useEarnedBadges, useRecordBadges } from "@/lib/notifications";
 import { useBucketList, useJournal, useMe, useMilestones, useMoments } from "@/lib/queries";
 import { useRequireSpace } from "@/lib/use-require-space";
 
@@ -105,7 +106,51 @@ function UsPage() {
     });
   }, [moments, entries, data?.space.anniversary_date]);
 
+  const { data: recorded } = useEarnedBadges(data?.space.id);
+  const recordBadges = useRecordBadges(data?.space.id, me?.id);
+
+  const recordedKeys = useMemo(() => new Set((recorded ?? []).map((row) => row.key)), [recorded]);
+
   const earned = badges.filter((badge) => badge.earned);
+
+  const earnedAt = useMemo(
+    () => new Map((recorded ?? []).map((row) => [row.key, row.earned_at])),
+    [recorded],
+  );
+
+  /**
+   * Bank any badge the couple has reached but never had recorded. The insert
+   * is the unlock: it dates the badge and tells both of them. It is idempotent,
+   * so this is safe on every visit and from both devices at once — but we still
+   * only fire once per set of keys, to keep a render loop out of the network.
+   */
+  const bankedRef = useRef("");
+  useEffect(() => {
+    if (!data?.space.id || recorded === undefined) return;
+
+    const missing = earned
+      .filter((badge) => !recordedKeys.has(badge.key))
+      .map((badge) => badge.key as BadgeKey);
+    if (missing.length === 0) return;
+
+    const signature = missing.slice().sort().join(",");
+    if (bankedRef.current === signature) return;
+    bankedRef.current = signature;
+
+    recordBadges.mutate(missing, {
+      onSuccess: (keys) => {
+        if (keys.length === 1) {
+          toast.success(`Badge unlocked — ${badgeTitle(keys[0]!)}`);
+        } else if (keys.length > 1) {
+          toast.success(`${keys.length} badges unlocked`);
+        }
+      },
+      onError: () => {
+        // Let the next visit try again rather than losing the unlock.
+        bankedRef.current = "";
+      },
+    });
+  }, [data?.space.id, recorded, recordedKeys, earned, recordBadges]);
 
   async function addMilestone() {
     if (!me || !data || title.trim().length === 0) {
@@ -315,7 +360,11 @@ function UsPage() {
             >
               <Award className={`size-4 ${badge.earned ? "text-gold" : "text-muted-foreground"}`} />
               <p className="mt-2 text-sm">{badge.title}</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">{badge.hint}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {earnedAt.get(badge.key)
+                  ? `Unlocked ${formatDay(earnedAt.get(badge.key))}`
+                  : badge.hint}
+              </p>
               <div className="mt-3 h-1 overflow-hidden rounded-full bg-secondary">
                 <div
                   className="h-full rounded-full bg-gold"

@@ -18,6 +18,7 @@ import { Route as AuthenticatedComposeRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedDatesRouteImport } from './routes/_authenticated/dates'
 import { Route as AuthenticatedFeedRouteImport } from './routes/_authenticated/feed'
 import { Route as AuthenticatedGamesRouteImport } from './routes/_authenticated/games'
+import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
 import { Route as AuthenticatedMapRouteImport } from './routes/_authenticated/map'
 import { Route as AuthenticatedStartRouteImport } from './routes/_authenticated/start'
@@ -69,6 +70,11 @@ const AuthenticatedGamesRoute = AuthenticatedGamesRouteImport.update({
   path: '/games',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedJournalRoute = AuthenticatedJournalRouteImport.update({
   id: '/journal',
   path: '/journal',
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/dates': typeof AuthenticatedDatesRoute
   '/feed': typeof AuthenticatedFeedRoute
   '/games': typeof AuthenticatedGamesRoute
+  '/inbox': typeof AuthenticatedInboxRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/map': typeof AuthenticatedMapRoute
   '/start': typeof AuthenticatedStartRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByTo {
   '/dates': typeof AuthenticatedDatesRoute
   '/feed': typeof AuthenticatedFeedRoute
   '/games': typeof AuthenticatedGamesRoute
+  '/inbox': typeof AuthenticatedInboxRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/map': typeof AuthenticatedMapRoute
   '/start': typeof AuthenticatedStartRoute
@@ -144,6 +152,7 @@ export interface FileRoutesById {
   '/_authenticated/dates': typeof AuthenticatedDatesRoute
   '/_authenticated/feed': typeof AuthenticatedFeedRoute
   '/_authenticated/games': typeof AuthenticatedGamesRoute
+  '/_authenticated/inbox': typeof AuthenticatedInboxRoute
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
   '/_authenticated/map': typeof AuthenticatedMapRoute
   '/_authenticated/start': typeof AuthenticatedStartRoute
@@ -162,6 +171,7 @@ export interface FileRouteTypes {
     | '/dates'
     | '/feed'
     | '/games'
+    | '/inbox'
     | '/journal'
     | '/map'
     | '/start'
@@ -178,6 +188,7 @@ export interface FileRouteTypes {
     | '/dates'
     | '/feed'
     | '/games'
+    | '/inbox'
     | '/journal'
     | '/map'
     | '/start'
@@ -195,6 +206,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dates'
     | '/_authenticated/feed'
     | '/_authenticated/games'
+    | '/_authenticated/inbox'
     | '/_authenticated/journal'
     | '/_authenticated/map'
     | '/_authenticated/start'
@@ -276,6 +288,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGamesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/inbox': {
+      id: '/_authenticated/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof AuthenticatedInboxRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/journal': {
       id: '/_authenticated/journal'
       path: '/journal'
@@ -327,6 +346,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDatesRoute: typeof AuthenticatedDatesRoute
   AuthenticatedFeedRoute: typeof AuthenticatedFeedRoute
   AuthenticatedGamesRoute: typeof AuthenticatedGamesRoute
+  AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
   AuthenticatedJournalRoute: typeof AuthenticatedJournalRoute
   AuthenticatedMapRoute: typeof AuthenticatedMapRoute
   AuthenticatedStartRoute: typeof AuthenticatedStartRoute
@@ -340,6 +360,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDatesRoute: AuthenticatedDatesRoute,
   AuthenticatedFeedRoute: AuthenticatedFeedRoute,
   AuthenticatedGamesRoute: AuthenticatedGamesRoute,
+  AuthenticatedInboxRoute: AuthenticatedInboxRoute,
   AuthenticatedJournalRoute: AuthenticatedJournalRoute,
   AuthenticatedMapRoute: AuthenticatedMapRoute,
   AuthenticatedStartRoute: AuthenticatedStartRoute,

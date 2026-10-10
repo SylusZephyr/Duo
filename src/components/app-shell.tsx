@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
+  Bell,
   BookHeart,
   Compass,
   Dices,
@@ -12,7 +13,9 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { useUnreadNotifications } from "@/lib/notifications";
 import { useMe, useUnreadMessages } from "@/lib/queries";
+import { useNotificationsRealtime } from "@/lib/realtime";
 import { cn } from "@/lib/utils";
 
 const TABS = [
@@ -44,6 +47,11 @@ export function AppShell({
   const navigate = useNavigate();
   const { data: me } = useMe();
   const { data: unread } = useUnreadMessages(me?.id);
+  const { data: unreadNotifications } = useUnreadNotifications(me?.id);
+
+  // The bell lives in every header, so the subscription that keeps it honest
+  // belongs here rather than on one screen.
+  useNotificationsRealtime(me?.id);
 
   return (
     <div className="min-h-screen bg-background pb-28">
@@ -62,6 +70,21 @@ export function AppShell({
           </div>
           <div className="flex items-center gap-2">
             {action}
+            <Link
+              to="/inbox"
+              className="press relative grid size-10 place-items-center rounded-full border border-border bg-card text-muted-foreground shadow-soft transition-colors hover:text-candy"
+              activeProps={{ className: "border-candy/50 bg-candy-soft text-candy" }}
+              aria-label={
+                (unreadNotifications ?? 0) > 0 ? `Inbox, ${unreadNotifications} unread` : "Inbox"
+              }
+            >
+              <Bell className="size-[18px]" />
+              {(unreadNotifications ?? 0) > 0 ? (
+                <span className="bg-gradient-candy absolute -right-0.5 -top-0.5 grid min-w-[18px] place-items-center rounded-full px-1 text-[10px] font-bold text-white">
+                  {unreadNotifications! > 9 ? "9+" : unreadNotifications}
+                </span>
+              ) : null}
+            </Link>
             <Link
               to="/explore"
               className="press grid size-10 place-items-center rounded-full border border-border bg-card text-muted-foreground shadow-soft transition-colors hover:text-candy"
