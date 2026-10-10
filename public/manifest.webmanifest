@@ -1,0 +1,28 @@
+{
+  "name": "Duo — a private space for two",
+  "short_name": "Duo",
+  "description": "Share moments, map the places you've been, keep a journal, and mark your milestones — just the two of you.",
+  "id": "/",
+  "start_url": "/feed",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#100b18",
+  "theme_color": "#100b18",
+  "categories": ["lifestyle", "social", "photo"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    { "name": "Add a moment", "url": "/compose" },
+    { "name": "Chat", "url": "/chat" },
+    { "name": "Your map", "url": "/map" }
+  ]
+}

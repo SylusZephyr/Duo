@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 import { Route as AuthenticatedComposeRouteImport } from './routes/_authenticated/compose'
 import { Route as AuthenticatedDatesRouteImport } from './routes/_authenticated/dates'
@@ -43,6 +44,11 @@ const AuthRoute = AuthRouteImport.update({
 const ExploreRoute = ExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedChatRoute = AuthenticatedChatRouteImport.update({
@@ -111,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/chat': typeof AuthenticatedChatRoute
   '/compose': typeof AuthenticatedComposeRoute
   '/dates': typeof AuthenticatedDatesRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/chat': typeof AuthenticatedChatRoute
   '/compose': typeof AuthenticatedComposeRoute
   '/dates': typeof AuthenticatedDatesRoute
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/chat': typeof AuthenticatedChatRoute
   '/_authenticated/compose': typeof AuthenticatedComposeRoute
   '/_authenticated/dates': typeof AuthenticatedDatesRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/explore'
+    | '/reset-password'
     | '/chat'
     | '/compose'
     | '/dates'
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/explore'
+    | '/reset-password'
     | '/chat'
     | '/compose'
     | '/dates'
@@ -201,6 +212,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/explore'
+    | '/reset-password'
     | '/_authenticated/chat'
     | '/_authenticated/compose'
     | '/_authenticated/dates'
@@ -220,6 +232,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ExploreRoute: typeof ExploreRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   CHandleRoute: typeof CHandleRoute
 }
 
@@ -251,6 +264,13 @@ declare module '@tanstack/react-router' {
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/chat': {
@@ -376,6 +396,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ExploreRoute: ExploreRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   CHandleRoute: CHandleRoute,
 }
 export const routeTree = rootRouteImport
