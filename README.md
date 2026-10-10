@@ -1,12 +1,46 @@
-# Our Shared Story
+# Duo
 
-I want to build an all in one app for lovers, the overall idea is to create an open space where the two can share their moments together privately and also acts as a lot more. It can be an instagram for couples. They can also mark their achievements, they can have a world map which can further be pinched in zoomed to have each place’s detailed map and they can keep track of places they’ve visited together by the photos that they share on the app. App has many more features like journaling, and features that allow them to also share whatever they want publicly with others. A social media app for lovers.
-
-This project was built with [Lovable](https://lovable.dev).
+A private social app for two. A shared feed of moments, a world map of the
+places you have been, a journal with sealed letters you can date into the
+future, a chat, games, countdowns and the milestones worth keeping — all
+private between the two of you, until you choose to make something public.
 
 **Live app**: https://evasive.lovable.app
 
+See [ROADMAP.md](./ROADMAP.md) for where this is and what is still missing.
+
+## Stack
+
+TanStack Start (React 19) · Tailwind 4 · shadcn/ui · Supabase (Postgres, Auth,
+Storage, Realtime) · deployed on Cloudflare via Nitro.
+
+Most of the product rules live in the database: row-level security scopes every
+table to a space, a space is capped at two members by both the join RPC and the
+policy, and notifications are fanned out by triggers rather than by the client.
+
+## Checks
+
+```sh
+npm run verify     # lint + typecheck + unit tests
+npm run test:db    # applies every migration to a throwaway Postgres, then runs schema tests
+npm run build
+```
+
+`npm run test:db` needs a local `postgresql-16` and never touches a real
+project: it starts a cluster in a temp directory, applies
+`supabase/migrations/*.sql` behind a small Supabase shim, runs the assertions
+in `supabase/tests/`, and throws the cluster away. CI runs all of it.
+
+## Database changes
+
+Migrations are plain SQL in `supabase/migrations/`, applied in filename order.
+Add one, run `npm run test:db` until it is green, then apply it to the project
+with `supabase db push`. **A migration in the repo is not a migration in
+production** — the schema tests prove it applies, not that it has been applied.
+
 ## Build with Lovable
+
+This project is connected to [Lovable](https://lovable.dev).
 
 Continue developing this project in the [Lovable editor](https://lovable.dev/projects/0739873c-4321-4cb2-9f9a-9e40a3a1ef6e).
 
