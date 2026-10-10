@@ -24,7 +24,11 @@ export const journalSchema = z.object({
   mood: z.string().trim().max(24).nullable().optional(),
   entryDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   isSealed: z.boolean(),
-  unlockAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  unlockAt: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable()
+    .optional(),
 });
 
 export const milestoneSchema = z.object({
@@ -64,7 +68,11 @@ export const spaceSettingsSchema = z.object({
     .regex(/^[a-z0-9-]{3,30}$/, { message: "3–30 characters: lowercase letters, numbers, hyphens" })
     .nullable()
     .optional(),
-  anniversaryDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  anniversaryDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable()
+    .optional(),
   isPublic: z.boolean(),
 });
 
@@ -75,7 +83,13 @@ export const reportSchema = z.object({
 
 export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 export const MAX_PHOTOS_PER_MOMENT = 8;
-export const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
+export const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+  "image/heif",
+];
 
 export function describeZodError(error: unknown, fallback = "Please check the form") {
   if (error instanceof z.ZodError) return error.issues[0]?.message ?? fallback;

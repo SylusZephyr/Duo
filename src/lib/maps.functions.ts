@@ -92,7 +92,8 @@ export const reverseGeocode = createServerFn({ method: "POST" })
     const result = json.results?.[0];
     if (!result) return null;
     const components = result.address_components ?? [];
-    const pick = (type: string) => components.find((c) => c.types.includes(type))?.long_name ?? null;
+    const pick = (type: string) =>
+      components.find((c) => c.types.includes(type))?.long_name ?? null;
     return {
       id: result.place_id,
       name: pick("neighborhood") ?? pick("locality") ?? result.formatted_address,

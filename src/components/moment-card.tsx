@@ -146,7 +146,9 @@ export function MomentCard({
                 }`}
               >
                 {emoji}
-                {count > 0 ? <span className="ml-1 text-xs text-muted-foreground">{count}</span> : null}
+                {count > 0 ? (
+                  <span className="ml-1 text-xs text-muted-foreground">{count}</span>
+                ) : null}
               </button>
             );
           })}

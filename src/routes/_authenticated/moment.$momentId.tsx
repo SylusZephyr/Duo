@@ -14,7 +14,10 @@ export const Route = createFileRoute("/_authenticated/moment/$momentId")({
   head: () => ({
     meta: [
       { title: "A moment — Duo" },
-      { name: "description", content: "A single moment from your shared timeline, with your notes to each other." },
+      {
+        name: "description",
+        content: "A single moment from your shared timeline, with your notes to each other.",
+      },
       { property: "og:title", content: "A moment — Duo" },
       { property: "og:description", content: "One moment, and what you said about it." },
       { name: "robots", content: "noindex" },

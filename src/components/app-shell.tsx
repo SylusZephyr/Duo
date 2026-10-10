@@ -105,11 +105,7 @@ export function AppShell({
               <Plus className="size-6" strokeWidth={2.5} />
             </button>
             {TABS.slice(2).map((tab) => (
-              <TabLink
-                key={tab.to}
-                {...tab}
-                badge={tab.to === "/chat" ? (unread ?? 0) : 0}
-              />
+              <TabLink key={tab.to} {...tab} badge={tab.to === "/chat" ? (unread ?? 0) : 0} />
             ))}
           </div>
         </div>

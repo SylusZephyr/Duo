@@ -38,7 +38,9 @@ export function useStories(spaceId: string | undefined) {
     queryFn: async (): Promise<Story[]> => {
       const { data, error } = await supabase
         .from("stories")
-        .select("id, author_id, storage_path, blur_data_url, caption, created_at, expires_at, story_views(user_id)")
+        .select(
+          "id, author_id, storage_path, blur_data_url, caption, created_at, expires_at, story_views(user_id)",
+        )
         .eq("space_id", spaceId!)
         .gt("expires_at", new Date().toISOString())
         .order("created_at", { ascending: true });
@@ -81,10 +83,12 @@ export function useAddStory(spaceId: string | undefined) {
 }
 
 export async function markStorySeen(storyId: string, userId: string) {
-  await supabase.from("story_views").upsert(
-    { story_id: storyId, user_id: userId },
-    { onConflict: "story_id,user_id", ignoreDuplicates: true },
-  );
+  await supabase
+    .from("story_views")
+    .upsert(
+      { story_id: storyId, user_id: userId },
+      { onConflict: "story_id,user_id", ignoreDuplicates: true },
+    );
 }
 
 export async function deleteStory(storyId: string) {
@@ -101,7 +105,9 @@ export function useMessages(spaceId: string | undefined) {
     queryFn: async (): Promise<Message[]> => {
       const { data, error } = await supabase
         .from("messages")
-        .select("id, author_id, kind, body, storage_path, reply_to, seen_at, created_at, message_reactions(id, emoji, user_id)")
+        .select(
+          "id, author_id, kind, body, storage_path, reply_to, seen_at, created_at, message_reactions(id, emoji, user_id)",
+        )
         .eq("space_id", spaceId!)
         .order("created_at", { ascending: false })
         .limit(300);
@@ -207,11 +213,18 @@ export async function markMessagesSeen(spaceId: string, userId: string) {
     .is("seen_at", null);
 }
 
-export async function toggleMessageReaction(messageId: string, userId: string, emoji: string, existingId?: string) {
+export async function toggleMessageReaction(
+  messageId: string,
+  userId: string,
+  emoji: string,
+  existingId?: string,
+) {
   if (existingId) {
     await supabase.from("message_reactions").delete().eq("id", existingId);
   } else {
-    await supabase.from("message_reactions").insert({ message_id: messageId, user_id: userId, emoji });
+    await supabase
+      .from("message_reactions")
+      .insert({ message_id: messageId, user_id: userId, emoji });
   }
 }
 
@@ -224,7 +237,9 @@ export function useGameRounds(spaceId: string | undefined) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("game_rounds")
-        .select("id, game, question, options, round_date, created_by, created_at, game_answers(id, user_id, answer, created_at)")
+        .select(
+          "id, game, question, options, round_date, created_by, created_at, game_answers(id, user_id, answer, created_at)",
+        )
         .eq("space_id", spaceId!)
         .order("created_at", { ascending: false })
         .limit(60);
@@ -241,7 +256,12 @@ export function useGameRounds(spaceId: string | undefined) {
 export function useStartRound(spaceId: string | undefined) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { game: string; question: string; options: string[]; userId: string }) => {
+    mutationFn: async (input: {
+      game: string;
+      question: string;
+      options: string[];
+      userId: string;
+    }) => {
       const { error } = await supabase.from("game_rounds").insert({
         space_id: spaceId!,
         game: input.game,
@@ -331,7 +351,13 @@ export function useSocialRealtime(spaceId: string | undefined, userId: string | 
   useEffect(() => {
     if (!spaceId) return;
     const channel = supabase.channel(`social:${spaceId}`);
-    const spaceTables = ["messages", "stories", "game_rounds", "game_answers", "countdowns"] as const;
+    const spaceTables = [
+      "messages",
+      "stories",
+      "game_rounds",
+      "game_answers",
+      "countdowns",
+    ] as const;
     for (const table of spaceTables) {
       channel.on(
         "postgres_changes",
@@ -343,8 +369,10 @@ export function useSocialRealtime(spaceId: string | undefined, userId: string | 
         },
       );
     }
-    channel.on("postgres_changes", { event: "*", schema: "public", table: "message_reactions" }, () =>
-      qc.invalidateQueries({ queryKey: ["messages", spaceId] }),
+    channel.on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "message_reactions" },
+      () => qc.invalidateQueries({ queryKey: ["messages", spaceId] }),
     );
     channel.subscribe();
     return () => {

@@ -33,7 +33,11 @@ export const MAP_STYLE = [
   { elementType: "labels.text.fill", stylers: [{ color: "#9a9086" }] },
   { elementType: "labels.text.stroke", stylers: [{ color: "#141210" }] },
   { featureType: "administrative", elementType: "geometry", stylers: [{ color: "#2a2521" }] },
-  { featureType: "administrative.country", elementType: "labels.text.fill", stylers: [{ color: "#b8a894" }] },
+  {
+    featureType: "administrative.country",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#b8a894" }],
+  },
   { featureType: "poi", stylers: [{ visibility: "off" }] },
   { featureType: "road", elementType: "geometry", stylers: [{ color: "#2b2622" }] },
   { featureType: "road", elementType: "labels", stylers: [{ visibility: "off" }] },

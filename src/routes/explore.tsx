@@ -64,7 +64,10 @@ function ExplorePage() {
         ) : (
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {moments.map((moment) => (
-              <article key={moment.id} className="overflow-hidden rounded-3xl border border-border bg-card">
+              <article
+                key={moment.id}
+                className="overflow-hidden rounded-3xl border border-border bg-card"
+              >
                 {moment.photos[0] ? (
                   <img
                     src={moment.photos[0]}
@@ -76,7 +79,11 @@ function ExplorePage() {
                 <div className="space-y-2 px-4 py-4">
                   <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
                     {moment.space.handle ? (
-                      <Link to="/c/$handle" params={{ handle: moment.space.handle }} className="text-gold">
+                      <Link
+                        to="/c/$handle"
+                        params={{ handle: moment.space.handle }}
+                        className="text-gold"
+                      >
                         {moment.space.name}
                       </Link>
                     ) : (
@@ -85,7 +92,9 @@ function ExplorePage() {
                     · {formatShortDay(moment.taken_at)}
                   </p>
                   {moment.caption ? (
-                    <p className="text-[15px] leading-relaxed text-foreground/90">{moment.caption}</p>
+                    <p className="text-[15px] leading-relaxed text-foreground/90">
+                      {moment.caption}
+                    </p>
                   ) : null}
                   {moment.place_name || moment.city ? (
                     <p className="flex items-center gap-1.5 text-xs text-muted-foreground">

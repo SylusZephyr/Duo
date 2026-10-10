@@ -82,7 +82,10 @@ function PublicSpacePage() {
         ) : (
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
             {space.moments.map((moment) => (
-              <article key={moment.id} className="overflow-hidden rounded-3xl border border-border bg-card">
+              <article
+                key={moment.id}
+                className="overflow-hidden rounded-3xl border border-border bg-card"
+              >
                 {moment.photos[0] ? (
                   <img
                     src={moment.photos[0]}
@@ -96,7 +99,9 @@ function PublicSpacePage() {
                     {formatShortDay(moment.taken_at)}
                   </p>
                   {moment.caption ? (
-                    <p className="text-[15px] leading-relaxed text-foreground/90">{moment.caption}</p>
+                    <p className="text-[15px] leading-relaxed text-foreground/90">
+                      {moment.caption}
+                    </p>
                   ) : null}
                   {moment.place_name || moment.city ? (
                     <p className="flex items-center gap-1.5 text-xs text-muted-foreground">

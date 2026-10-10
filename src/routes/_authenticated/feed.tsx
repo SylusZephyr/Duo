@@ -30,12 +30,7 @@ function FeedPage() {
   const { data: me } = useMe();
   const { data, isLoading } = useRequireSpace();
   const spaceId = data?.space.id;
-  const {
-    data: moments,
-    isLoading: loadingMoments,
-    isError,
-    refetch,
-  } = useMoments(spaceId);
+  const { data: moments, isLoading: loadingMoments, isError, refetch } = useMoments(spaceId);
   const { data: prompt } = useDailyPrompt(spaceId);
 
   useSpaceRealtime(spaceId);
@@ -109,7 +104,11 @@ function FeedPage() {
               </h2>
               <div className="space-y-5">
                 {group.map((moment, i) => (
-                  <div key={moment.id} className="duo-rise" style={{ animationDelay: `${i * 40}ms` }}>
+                  <div
+                    key={moment.id}
+                    className="duo-rise"
+                    style={{ animationDelay: `${i * 40}ms` }}
+                  >
                     <MomentCard
                       moment={moment}
                       members={data?.members ?? []}

@@ -18,15 +18,14 @@ export function EmptyState({
 }) {
   return (
     <div
-      className={cn(
-        "rounded-3xl border border-border bg-card px-6 py-14 text-center",
-        className,
-      )}
+      className={cn("rounded-3xl border border-border bg-card px-6 py-14 text-center", className)}
     >
       {icon ? <div className="mx-auto mb-4 text-muted-foreground">{icon}</div> : null}
       <h2 className="font-display text-2xl">{title}</h2>
       {body ? (
-        <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">{body}</p>
+        <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">
+          {body}
+        </p>
       ) : null}
       {action ? <div className="mt-6 flex justify-center">{action}</div> : null}
     </div>

@@ -365,9 +365,10 @@ export function useAddComment(postId: string | undefined) {
     },
     onMutate: async (input) => {
       await queryClient.cancelQueries({ queryKey: key });
-      const previous = queryClient.getQueryData<
-        { id: string; author_id: string; body: string; created_at: string }[]
-      >(key);
+      const previous =
+        queryClient.getQueryData<
+          { id: string; author_id: string; body: string; created_at: string }[]
+        >(key);
       queryClient.setQueryData(key, [
         ...(previous ?? []),
         {

@@ -12,7 +12,10 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in to Duo" },
-      { name: "description", content: "Sign in to your shared space on Duo — moments, places and journals for two." },
+      {
+        name: "description",
+        content: "Sign in to your shared space on Duo — moments, places and journals for two.",
+      },
       { property: "og:title", content: "Sign in to Duo" },
       { property: "og:description", content: "Your private space for two." },
       { name: "robots", content: "noindex" },
@@ -145,7 +148,8 @@ function AuthPage() {
             </form>
 
             <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
+              <span className="h-px flex-1 bg-border" /> or{" "}
+              <span className="h-px flex-1 bg-border" />
             </div>
 
             <Button
@@ -160,7 +164,9 @@ function AuthPage() {
               onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
               className="mt-8 w-full text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
-              {mode === "signin" ? "New here? Create an account" : "Already have an account? Sign in"}
+              {mode === "signin"
+                ? "New here? Create an account"
+                : "Already have an account? Sign in"}
             </button>
           </>
         ) : null}

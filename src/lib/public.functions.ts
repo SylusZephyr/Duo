@@ -68,14 +68,18 @@ export const getPublicSpace = createServerFn({ method: "GET" })
 
     const { data: posts } = await supabase
       .from("posts")
-      .select("id, caption, taken_at, place_name, city, country, created_at, post_media(storage_path, position)")
+      .select(
+        "id, caption, taken_at, place_name, city, country, created_at, post_media(storage_path, position)",
+      )
       .eq("space_id", space.id)
       .eq("visibility", "public")
       .order("created_at", { ascending: false })
       .limit(60);
 
     const rows = posts ?? [];
-    const signed = await signPaths(rows.flatMap((r) => (r.post_media ?? []).map((m) => m.storage_path)));
+    const signed = await signPaths(
+      rows.flatMap((r) => (r.post_media ?? []).map((m) => m.storage_path)),
+    );
 
     return {
       name: space.name,

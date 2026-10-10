@@ -57,7 +57,9 @@ export function StoriesRow({
           return (
             <div key={m.user_id} className="flex w-[72px] shrink-0 flex-col items-center gap-1.5">
               <button
-                onClick={() => (list.length ? setOpenAuthor(m.user_id) : mine && fileRef.current?.click())}
+                onClick={() =>
+                  list.length ? setOpenAuthor(m.user_id) : mine && fileRef.current?.click()
+                }
                 className={cn(
                   "press relative grid size-[68px] place-items-center rounded-full p-[3px]",
                   list.length && (unseen || mine) ? "story-ring" : "bg-border",
@@ -167,7 +169,10 @@ function StoryViewer({
         <div className="absolute inset-x-0 top-0 bg-gradient-to-b from-foreground/70 to-transparent p-4 pt-[max(1rem,env(safe-area-inset-top))]">
           <div className="flex gap-1">
             {stories.map((s, i) => (
-              <div key={s.id} className="h-[3px] flex-1 overflow-hidden rounded-full bg-background/30">
+              <div
+                key={s.id}
+                className="h-[3px] flex-1 overflow-hidden rounded-full bg-background/30"
+              >
                 <div
                   className="h-full bg-background"
                   style={{ width: `${i < index ? 100 : i === index ? progress * 100 : 0}%` }}
@@ -195,7 +200,11 @@ function StoryViewer({
                   <Trash2 className="size-4" />
                 </button>
               ) : null}
-              <button aria-label="Close" onClick={onClose} className="grid size-9 place-items-center rounded-full bg-background/15">
+              <button
+                aria-label="Close"
+                onClick={onClose}
+                className="grid size-9 place-items-center rounded-full bg-background/15"
+              >
                 <X className="size-5" />
               </button>
             </div>
@@ -207,7 +216,11 @@ function StoryViewer({
           onPointerUp={() => setPaused(false)}
           onPointerLeave={() => setPaused(false)}
         >
-          <button aria-label="Previous" className="h-full w-1/3" onClick={() => setIndex((i) => Math.max(0, i - 1))} />
+          <button
+            aria-label="Previous"
+            className="h-full w-1/3"
+            onClick={() => setIndex((i) => Math.max(0, i - 1))}
+          />
           <button
             aria-label="Next"
             className="h-full flex-1"

@@ -20,7 +20,10 @@ export const Route = createFileRoute("/_authenticated/journal")({
   head: () => ({
     meta: [
       { title: "Journal — Duo" },
-      { name: "description", content: "Write together, or seal a letter to open on a future date." },
+      {
+        name: "description",
+        content: "Write together, or seal a letter to open on a future date.",
+      },
       { property: "og:title", content: "Journal — Duo" },
       { property: "og:description", content: "Shared entries and sealed letters." },
       { name: "robots", content: "noindex" },
@@ -46,7 +49,7 @@ function JournalPage() {
   const [filter, setFilter] = useState<Filter>("all");
   const [query, setQuery] = useState("");
 
-  const list = entries ?? [];
+  const list = useMemo(() => entries ?? [], [entries]);
 
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -220,7 +223,8 @@ function JournalPage() {
       ) : (
         <div className="space-y-4">
           {visible.map((entry, i) => {
-            const locked = entry.is_sealed && entry.unlock_at && new Date(entry.unlock_at) > new Date();
+            const locked =
+              entry.is_sealed && entry.unlock_at && new Date(entry.unlock_at) > new Date();
             const entryMood = moodOf(entry.mood);
             return (
               <article

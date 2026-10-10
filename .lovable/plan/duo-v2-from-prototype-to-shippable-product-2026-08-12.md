@@ -6,7 +6,7 @@ The current build has the skeleton: pairing, feed, map, journal, milestones, pub
 
 - **Real-time everywhere.** Feed, comments, reactions, journal and typing indicators update live for both partners instead of on refresh.
 - **Optimistic UI + offline queue.** Posting, reacting, commenting feel instant; uploads resume after a dropped connection.
-- **Image pipeline.** Client-side downscale + EXIF strip on upload, blurhash placeholder stored per photo, responsive derivatives so the feed loads in under a second on mobile data. EXIF GPS is read for auto-place suggestion *before* stripping, never stored silently.
+- **Image pipeline.** Client-side downscale + EXIF strip on upload, blurhash placeholder stored per photo, responsive derivatives so the feed loads in under a second on mobile data. EXIF GPS is read for auto-place suggestion _before_ stripping, never stored silently.
 - **Error, empty and loading states** for every screen: skeletons that match final layout, retry affordances, friendly failure copy. No blank screens.
 - **Validation layer.** Zod schemas shared between client and server functions for every write path; length limits, file-type and size limits, rate limits per user.
 - **Accessibility & responsiveness.** Keyboard paths, focus rings, contrast, reduced-motion support, safe-area handling, tablet/desktop layouts (not just a stretched phone).
@@ -26,26 +26,33 @@ The current build has the skeleton: pairing, feed, map, journal, milestones, pub
 ## Phase 3 — The features that make it a product
 
 **Feed & moments**
+
 - Multi-photo carousels with captions per photo, video support, albums/trips grouping, "On this day" resurfacing, collaborative posts (both credited), drafts, scheduled posts, edit history.
 - Reactions beyond one emoji, threaded comments, voice notes on a moment.
 - Search and filters: by place, person, mood, tag, date range; saved views.
 
 **Map**
+
 - Pin clustering that breaks apart on zoom, heatmap mode, country/city counters with a "passport" view, trip routes drawn between chronological pins, place detail pages aggregating every photo taken there, "want to go" wishlist pins, offline map tiles for travel.
 
 **Journal**
+
 - Rich text, prompts of the day, sealed letters with unlock notifications, mood tracking with a gentle chart, shared vs. solo entries, monthly recaps, calendar heat view.
 
 **Us — relationship layer**
+
 - Milestones with countdowns and anniversary reminders, streaks, badges with real progression, yearly "wrapped" recap generated from real data, shared bucket list with checkoff, questions-of-the-day ritual, a shared countdown widget for upcoming trips.
 
 **Public side**
+
 - Curated Moments feed, couple profile page with cover and stats, share cards rendered for link previews, follow-free by design (no vanity metrics), embeddable public trip pages.
 
 **Notifications**
+
 - Email and push for: partner posted, comment, reaction, sealed letter unlocked, anniversary tomorrow, streak at risk. Per-category preferences and quiet hours.
 
 **Monetization**
+
 - Free tier with limits (storage, video length, sealed letters); Duo+ subscription unlocking unlimited storage, video, printed photo-book export, offline maps, advanced recaps. Billing, upgrade/downgrade, receipts, and gating enforced server-side.
 
 ## Phase 4 — Design system, done properly

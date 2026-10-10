@@ -48,7 +48,10 @@ function makePinClass(maps: any) {
       node.style.cursor = "pointer";
       node.className = "duo-pin";
       node.setAttribute("role", "button");
-      node.setAttribute("aria-label", `${this.cluster.items[0]?.label ?? "Place"}, ${count} moment${count === 1 ? "" : "s"}`);
+      node.setAttribute(
+        "aria-label",
+        `${this.cluster.items[0]?.label ?? "Place"}, ${count} moment${count === 1 ? "" : "s"}`,
+      );
 
       const ring = wish ? "border-gold/80 border-dashed" : "border-ember";
       const scale = this.selected ? "scale-115" : "";

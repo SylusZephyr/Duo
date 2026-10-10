@@ -51,7 +51,10 @@ function Landing() {
       <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
         <span className="font-display text-2xl">Duo</span>
         <nav className="flex items-center gap-5 text-sm">
-          <Link to="/explore" className="text-muted-foreground transition-colors hover:text-foreground">
+          <Link
+            to="/explore"
+            className="text-muted-foreground transition-colors hover:text-foreground"
+          >
             Explore
           </Link>
           <Link
@@ -69,8 +72,9 @@ function Landing() {
           Everything you two make together, in one private place.
         </h1>
         <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-muted-foreground">
-          Duo holds your photos, the places you&apos;ve been, the things you write and the milestones
-          you pass. Only the two of you are inside — until you decide to let the world see something.
+          Duo holds your photos, the places you&apos;ve been, the things you write and the
+          milestones you pass. Only the two of you are inside — until you decide to let the world
+          see something.
         </p>
         <div className="mt-9 flex flex-wrap items-center gap-3">
           <Link

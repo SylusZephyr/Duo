@@ -20,7 +20,10 @@ export const Route = createFileRoute("/_authenticated/us")({
   head: () => ({
     meta: [
       { title: "Us — Duo" },
-      { name: "description", content: "Milestones, achievements and the settings for your shared space." },
+      {
+        name: "description",
+        content: "Milestones, achievements and the settings for your shared space.",
+      },
       { property: "og:title", content: "Us — Duo" },
       { property: "og:description", content: "Your milestones and badges." },
       { name: "robots", content: "noindex" },
@@ -48,10 +51,7 @@ function UsPage() {
   const [handle, setHandle] = useState(data?.space.handle ?? "");
   const [busy, setBusy] = useState(false);
 
-  const streak = useMemo(
-    () => postingStreak((moments ?? []).map((m) => m.taken_at)),
-    [moments],
-  );
+  const streak = useMemo(() => postingStreak((moments ?? []).map((m) => m.taken_at)), [moments]);
 
   async function addWish() {
     if (!me || !data || wish.trim().length === 0) return;
@@ -158,7 +158,10 @@ function UsPage() {
     <AppShell title="Us" subtitle={days !== null ? `Day ${days.toLocaleString()}` : "Your story"}>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Moments" value={(moments ?? []).length} />
-        <Stat label="Places" value={new Set((moments ?? []).map((m) => m.city).filter(Boolean)).size} />
+        <Stat
+          label="Places"
+          value={new Set((moments ?? []).map((m) => m.city).filter(Boolean)).size}
+        />
         <Stat label="Day streak" value={streak} />
         <Stat label="Badges" value={earned.length} />
       </div>
@@ -205,7 +208,9 @@ function UsPage() {
                 <button
                   onClick={() => void toggleWish(item.id, item.done)}
                   className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-colors ${
-                    item.done ? "border-gold/35 bg-gold/[0.04]" : "border-border bg-card hover:border-ember/40"
+                    item.done
+                      ? "border-gold/35 bg-gold/[0.04]"
+                      : "border-border bg-card hover:border-ember/40"
                   }`}
                 >
                   <span
@@ -215,7 +220,9 @@ function UsPage() {
                   >
                     {item.done ? <Check className="size-3" /> : null}
                   </span>
-                  <span className={`text-sm ${item.done ? "text-muted-foreground line-through" : ""}`}>
+                  <span
+                    className={`text-sm ${item.done ? "text-muted-foreground line-through" : ""}`}
+                  >
                     {item.title}
                   </span>
                 </button>
@@ -224,7 +231,6 @@ function UsPage() {
           </ul>
         )}
       </section>
-
 
       <section className="mt-7">
         <div className="flex items-end justify-between">
@@ -389,7 +395,9 @@ function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-2xl border border-border bg-card px-4 py-4 text-center">
       <p className="font-display text-3xl leading-none">{value}</p>
-      <p className="mt-1.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{label}</p>
+      <p className="mt-1.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+        {label}
+      </p>
     </div>
   );
 }

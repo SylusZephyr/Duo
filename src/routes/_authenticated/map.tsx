@@ -22,7 +22,8 @@ export const Route = createFileRoute("/_authenticated/map")({
       { title: "Your places — Duo" },
       {
         name: "description",
-        content: "Every place the two of you have been, pinned from your photos, plus the ones you still dream of.",
+        content:
+          "Every place the two of you have been, pinned from your photos, plus the ones you still dream of.",
       },
       { property: "og:title", content: "Your places — Duo" },
       { property: "og:description", content: "A world map built from your moments." },
@@ -56,7 +57,9 @@ function MapPage() {
 
   const years = useMemo(
     () =>
-      Array.from(new Set(located.map((moment) => moment.taken_at.slice(0, 4)))).sort().reverse(),
+      Array.from(new Set(located.map((moment) => moment.taken_at.slice(0, 4))))
+        .sort()
+        .reverse(),
     [located],
   );
 
@@ -309,7 +312,8 @@ function MapPage() {
         <div className="flex items-end justify-between">
           <h2 className="text-2xl">Someday</h2>
           <span className="flex items-center gap-1 text-xs uppercase tracking-[0.14em] text-gold">
-            <Sparkles className="size-3.5" /> {(wishlist ?? []).filter((p) => !p.visited).length} to go
+            <Sparkles className="size-3.5" /> {(wishlist ?? []).filter((p) => !p.visited).length} to
+            go
           </span>
         </div>
         <PlacePicker value={dream} onChange={setDream} />

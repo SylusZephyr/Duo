@@ -14,7 +14,11 @@ export const Route = createFileRoute("/_authenticated/games")({
   head: () => ({
     meta: [
       { title: "Games — Duo" },
-      { name: "description", content: "Daily couple games: would you rather, who's more likely, and how well you know each other." },
+      {
+        name: "description",
+        content:
+          "Daily couple games: would you rather, who's more likely, and how well you know each other.",
+      },
       { property: "og:title", content: "Games — Duo" },
       { property: "og:description", content: "Play little games together every day." },
       { name: "robots", content: "noindex" },
@@ -81,21 +85,29 @@ function GamesPage() {
   useSocialRealtime(spaceId, me?.id);
 
   const members = data?.members ?? [];
-  const nameOf = (id: string) => (id === me?.id ? "You" : (members.find((m) => m.user_id === id)?.display_name ?? "Them"));
+  const nameOf = (id: string) =>
+    id === me?.id ? "You" : (members.find((m) => m.user_id === id)?.display_name ?? "Them");
   const bothAnswered = (rounds ?? []).filter((r) => r.answers.length >= 2);
-  const matches = bothAnswered.filter((r) => r.game !== "know" && r.answers[0]?.answer === r.answers[1]?.answer).length;
+  const matches = bothAnswered.filter(
+    (r) => r.game !== "know" && r.answers[0]?.answer === r.answers[1]?.answer,
+  ).length;
 
   function startGame(key: GameKey) {
     if (!me) return;
     const game = GAMES[key];
     const used = new Set((rounds ?? []).map((r) => r.question));
     const pool = game.bank.filter((q) => !used.has(questionText(key, q)));
-    const pick = (pool.length ? pool : game.bank)[Math.floor(Math.random() * (pool.length || game.bank.length))]!;
+    const pick = (pool.length ? pool : game.bank)[
+      Math.floor(Math.random() * (pool.length || game.bank.length))
+    ]!;
     const options =
       key === "wyr" ? [...pick] : key === "likely" ? members.map((m) => m.display_name) : [];
     start.mutate(
       { game: key, question: questionText(key, pick), options, userId: me.id },
-      { onSuccess: () => toast.success("New round! Answer it, then wait for your person."), onError: () => toast.error("Couldn't start a round") },
+      {
+        onSuccess: () => toast.success("New round! Answer it, then wait for your person."),
+        onError: () => toast.error("Couldn't start a round"),
+      },
     );
   }
 
@@ -113,7 +125,10 @@ function GamesPage() {
             key={key}
             onClick={() => startGame(key)}
             disabled={start.isPending}
-            className={cn("press flex items-center gap-4 rounded-3xl bg-gradient-to-br p-5 text-left text-white shadow-lift", GAMES[key].color)}
+            className={cn(
+              "press flex items-center gap-4 rounded-3xl bg-gradient-to-br p-5 text-left text-white shadow-lift",
+              GAMES[key].color,
+            )}
           >
             <span className="text-4xl">{GAMES[key].emoji}</span>
             <span className="flex-1">
@@ -125,11 +140,17 @@ function GamesPage() {
         ))}
       </div>
 
-      <h2 className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">Rounds</h2>
+      <h2 className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+        Rounds
+      </h2>
       {isLoading ? (
         <ListSkeleton />
       ) : (rounds ?? []).length === 0 ? (
-        <EmptyState icon={<Dices className="mx-auto size-7 text-candy" />} title="No rounds yet" body="Pick a game above. Answers stay hidden until you've both played." />
+        <EmptyState
+          icon={<Dices className="mx-auto size-7 text-candy" />}
+          title="No rounds yet"
+          body="Pick a game above. Answers stay hidden until you've both played."
+        />
       ) : (
         <div className="space-y-4">
           {rounds!.map((r) => (
@@ -139,7 +160,11 @@ function GamesPage() {
               userId={me?.id}
               nameOf={nameOf}
               onAnswer={(value) =>
-                me && answer.mutate({ roundId: r.id, answer: value, userId: me.id }, { onError: () => toast.error("Couldn't save answer") })
+                me &&
+                answer.mutate(
+                  { roundId: r.id, answer: value, userId: me.id },
+                  { onError: () => toast.error("Couldn't save answer") },
+                )
               }
             />
           ))}
@@ -160,7 +185,9 @@ function Stat({ label, value, icon }: { label: string; value: number; icon?: boo
         {icon ? <Trophy className="size-4" /> : null}
         {value}
       </p>
-      <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">{label}</p>
+      <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+        {label}
+      </p>
     </div>
   );
 }
@@ -171,7 +198,14 @@ function RoundCard({
   nameOf,
   onAnswer,
 }: {
-  round: { id: string; game: string; question: string; options: string[]; answers: { id: string; user_id: string; answer: string }[]; created_at: string };
+  round: {
+    id: string;
+    game: string;
+    question: string;
+    options: string[];
+    answers: { id: string; user_id: string; answer: string }[];
+    created_at: string;
+  };
   userId: string | undefined;
   nameOf: (id: string) => string;
   onAnswer: (value: string) => void;
@@ -193,7 +227,11 @@ function RoundCard({
         round.options.length ? (
           <div className="mt-4 grid grid-cols-2 gap-2">
             {round.options.map((o) => (
-              <button key={o} onClick={() => onAnswer(o)} className="press rounded-2xl border border-border bg-secondary px-3 py-3 text-sm font-semibold hover:border-candy/50">
+              <button
+                key={o}
+                onClick={() => onAnswer(o)}
+                className="press rounded-2xl border border-border bg-secondary px-3 py-3 text-sm font-semibold hover:border-candy/50"
+              >
                 {o}
               </button>
             ))}
@@ -206,20 +244,36 @@ function RoundCard({
             }}
             className="mt-4 flex gap-2"
           >
-            <input value={text} onChange={(e) => setText(e.target.value)} maxLength={500} placeholder="Your answer…" className="h-11 flex-1 rounded-2xl border border-border bg-secondary px-4 text-sm outline-none focus:border-candy" />
-            <button className="press bg-gradient-candy rounded-2xl px-4 text-sm font-bold text-white">Lock in</button>
+            <input
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              maxLength={500}
+              placeholder="Your answer…"
+              className="h-11 flex-1 rounded-2xl border border-border bg-secondary px-4 text-sm outline-none focus:border-candy"
+            />
+            <button className="press bg-gradient-candy rounded-2xl px-4 text-sm font-bold text-white">
+              Lock in
+            </button>
           </form>
         )
       ) : revealed ? (
         <div className="mt-4 space-y-2">
           {round.answers.map((a) => (
-            <div key={a.id} className="flex items-center justify-between rounded-2xl bg-secondary px-4 py-2.5 text-sm">
+            <div
+              key={a.id}
+              className="flex items-center justify-between rounded-2xl bg-secondary px-4 py-2.5 text-sm"
+            >
               <span className="font-semibold text-muted-foreground">{nameOf(a.user_id)}</span>
               <span className="font-bold">{a.answer}</span>
             </div>
           ))}
           {round.game !== "know" ? (
-            <p className={cn("pt-1 text-center text-sm font-bold", same ? "text-candy" : "text-muted-foreground")}>
+            <p
+              className={cn(
+                "pt-1 text-center text-sm font-bold",
+                same ? "text-candy" : "text-muted-foreground",
+              )}
+            >
               {same ? "💞 Perfectly in sync!" : "Opposites attract 😄"}
             </p>
           ) : null}

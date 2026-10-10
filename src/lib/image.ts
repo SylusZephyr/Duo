@@ -90,7 +90,10 @@ async function makeBlur(source: ImageBitmap | HTMLImageElement): Promise<string>
 }
 
 /** Minimal JPEG APP1/EXIF reader — we only want GPS and DateTimeOriginal. */
-function readJpegExif(buffer: ArrayBuffer): { gps: { lat: number; lng: number } | null; takenAt: string | null } {
+function readJpegExif(buffer: ArrayBuffer): {
+  gps: { lat: number; lng: number } | null;
+  takenAt: string | null;
+} {
   const empty = { gps: null, takenAt: null };
   try {
     const view = new DataView(buffer);
@@ -138,7 +141,8 @@ function readTiff(view: DataView, start: number) {
         const length = u32(entry + 4);
         const at = length > 4 ? start + u32(entry + 8) : entry + 8;
         let text = "";
-        for (let c = 0; c < Math.min(length, 19); c += 1) text += String.fromCharCode(view.getUint8(at + c));
+        for (let c = 0; c < Math.min(length, 19); c += 1)
+          text += String.fromCharCode(view.getUint8(at + c));
         const match = text.match(/^(\d{4}):(\d{2}):(\d{2})/);
         if (match) takenAt = `${match[1]}-${match[2]}-${match[3]}`;
       }

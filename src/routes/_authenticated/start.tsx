@@ -14,7 +14,10 @@ export const Route = createFileRoute("/_authenticated/start")({
   head: () => ({
     meta: [
       { title: "Create your space — Duo" },
-      { name: "description", content: "Create a shared space or join your partner with an invite code." },
+      {
+        name: "description",
+        content: "Create a shared space or join your partner with an invite code.",
+      },
       { property: "og:title", content: "Create your space — Duo" },
       { property: "og:description", content: "Two people, one private space." },
       { name: "robots", content: "noindex" },
@@ -25,7 +28,10 @@ export const Route = createFileRoute("/_authenticated/start")({
 
 function inviteCode() {
   const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-  return Array.from({ length: 6 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join("");
+  return Array.from(
+    { length: 6 },
+    () => alphabet[Math.floor(Math.random() * alphabet.length)],
+  ).join("");
 }
 
 function StartPage() {
@@ -150,7 +156,8 @@ function StartPage() {
       </div>
 
       <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-        <span className="h-px flex-1 bg-border" /> or join <span className="h-px flex-1 bg-border" />
+        <span className="h-px flex-1 bg-border" /> or join{" "}
+        <span className="h-px flex-1 bg-border" />
       </div>
 
       <div className="space-y-3 rounded-3xl border border-border bg-card p-5">
