@@ -76,9 +76,10 @@ describe("clusterPoints", () => {
     const a = { lat: 10, lng: 10 };
     const b = { lat: 12, lng: 12 };
     const [cluster] = clusterPoints([a, b], 2);
-    expect(cluster.items).toHaveLength(2);
-    expect(cluster.lat).toBeCloseTo(11, 6);
-    expect(cluster.lng).toBeCloseTo(11, 6);
+    expect(cluster).toBeDefined();
+    expect(cluster!.items).toHaveLength(2);
+    expect(cluster!.lat).toBeCloseTo(11, 6);
+    expect(cluster!.lng).toBeCloseTo(11, 6);
   });
 
   it("keeps every point exactly once", () => {

@@ -26,14 +26,6 @@ export const Route = createFileRoute("/_authenticated/start")({
   component: StartPage,
 });
 
-function inviteCode() {
-  const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-  return Array.from(
-    { length: 6 },
-    () => alphabet[Math.floor(Math.random() * alphabet.length)],
-  ).join("");
-}
-
 function StartPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -48,21 +40,13 @@ function StartPage() {
     if (!me) return;
     setBusy(true);
     try {
-      const { data, error } = await supabase
-        .from("spaces")
-        .insert({
-          name: name.trim() || "Us",
-          created_by: me.id,
-          invite_code: inviteCode(),
-          ...(anniversary ? { anniversary_date: anniversary } : {}),
-        })
-        .select("id, invite_code")
-        .single();
+      // One RPC, one transaction: the space and the first membership land
+      // together, and the invite code is generated server-side.
+      const { data, error } = await supabase.rpc("create_space", {
+        _name: name.trim(),
+        _anniversary: anniversary || null,
+      });
       if (error) throw error;
-      const { error: memberError } = await supabase
-        .from("space_members")
-        .insert({ space_id: data.id, user_id: me.id });
-      if (memberError) throw memberError;
       await queryClient.invalidateQueries();
       toast.success(`Space created. Invite code: ${data.invite_code}`);
       navigate({ to: "/feed", replace: true });

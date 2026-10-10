@@ -11,18 +11,21 @@ export type Database = {
       achievements: {
         Row: {
           earned_at: string;
+          earned_by: string | null;
           id: string;
           key: string;
           space_id: string;
         };
         Insert: {
           earned_at?: string;
+          earned_by?: string | null;
           id?: string;
           key: string;
           space_id: string;
         };
         Update: {
           earned_at?: string;
+          earned_by?: string | null;
           id?: string;
           key?: string;
           space_id?: string;
@@ -347,6 +350,7 @@ export type Database = {
           photo_path: string | null;
           space_id: string;
           title: string;
+          unlock_announced_at: string | null;
           unlock_at: string | null;
           updated_at: string;
         };
@@ -361,6 +365,7 @@ export type Database = {
           photo_path?: string | null;
           space_id: string;
           title?: string;
+          unlock_announced_at?: string | null;
           unlock_at?: string | null;
           updated_at?: string;
         };
@@ -375,6 +380,7 @@ export type Database = {
           photo_path?: string | null;
           space_id?: string;
           title?: string;
+          unlock_announced_at?: string | null;
           unlock_at?: string | null;
           updated_at?: string;
         };
@@ -966,6 +972,8 @@ export type Database = {
           handle: string | null;
           id: string;
           invite_code: string;
+          invite_code_expires_at: string | null;
+          invite_code_rotated_at: string;
           is_public: boolean;
           name: string;
           updated_at: string;
@@ -978,6 +986,8 @@ export type Database = {
           handle?: string | null;
           id?: string;
           invite_code: string;
+          invite_code_expires_at?: string | null;
+          invite_code_rotated_at?: string;
           is_public?: boolean;
           name?: string;
           updated_at?: string;
@@ -990,6 +1000,8 @@ export type Database = {
           handle?: string | null;
           id?: string;
           invite_code?: string;
+          invite_code_expires_at?: string | null;
+          invite_code_rotated_at?: string;
           is_public?: boolean;
           name?: string;
           updated_at?: string;
@@ -1162,7 +1174,13 @@ export type Database = {
         Args: { _space_id: string; _user_id: string };
         Returns: boolean;
       };
+      announce_unlocked_letters: { Args: Record<string, never>; Returns: number };
+      create_space: {
+        Args: { _anniversary?: string | null; _name: string };
+        Returns: Database["public"]["Tables"]["spaces"]["Row"];
+      };
       join_space_by_code: { Args: { _code: string }; Returns: string };
+      rotate_invite_code: { Args: { _space_id: string }; Returns: string };
       space_member_count: { Args: { _space_id: string }; Returns: number };
     };
     Enums: {
